@@ -4,10 +4,10 @@ import Event from './Event'
 import CreateEvent from './CreateEvent';
 
 //Import fireStore reference from frebaseInit file
-import {db} from "../firebase-init";
+import { db } from "../firebase-init";
 
 //Import all the required functions from fireStore
-import { collection, getDocs, where, query,deleteDoc,doc} from "firebase/firestore"; 
+import { collection, getDocs, where, query, deleteDoc, doc } from "firebase/firestore";
 
 const Profile = ({ currentUser }) => {
   const [events, setEvents] = useState();
@@ -15,7 +15,7 @@ const Profile = ({ currentUser }) => {
   const [activeTab, setActiveTab] = useState('managing');
 
   // Fetch events data from the "Events" collection based on the "attended" array
-  const fetchEventsData = async (eventIDs=[]) => {
+  const fetchEventsData = async (eventIDs = []) => {
     const eventsData = [];
 
     // Loop through each event reference in the "attended" array
@@ -24,18 +24,18 @@ const Profile = ({ currentUser }) => {
         // Create a query to find events based on the "attended" array
         const eventsCollection = collection(db, 'Events');
         const q = query(eventsCollection, where('uid', '==', currentUser.uid));
-    
+
         // Execute the query
         const querySnapshot = await getDocs(q);
-    
+
         // Loop through the query results and add event data to eventsData array
         querySnapshot.forEach((doc) => {
           eventsData.push({
-            id:doc.id,
+            id: doc.id,
             ...doc.data()
           });
         });
-    
+
         return eventsData;
       } catch (error) {
         console.error('Error fetching events data:', error);
@@ -51,36 +51,43 @@ const Profile = ({ currentUser }) => {
     setActiveTab(tab);
   };
 
-// Function to delete an event
-const deleteEvent = async (eventId) => {
-  console.log(eventId);
-  try {
-    // const eventRef = collection(db, 'Events', eventId);
-    await deleteDoc(doc(db, "Events", eventId.toString()));
+  // Function to delete an event
+  const handleDelete = async (eventId) => {
+    console.log(eventId);
+    try {
+      // const eventRef = collection(db, 'Events', eventId);
+      await deleteDoc(doc(db, "Events", eventId.toString()));
+      // Fetch updated events data after deletion
+      fetchUpdatedEvents();
+      setActiveTab('managing');
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      // Handle error
+    }
+  };
 
-    // Fetch updated events data after deletion
-    fetchUpdatedEvents();
-  } catch (error) {
-    console.error('Error deleting event:', error);
-    // Handle error
+  const handleEdit = (eventId)=>{
+    setActiveTab('managing');
   }
-};
 
-// Fetch updated events data after deletion
-const fetchUpdatedEvents = () => {
-  // Call the function to fetch attended events data
-  fetchEventsData(currentUser.attended).then((eventsData) => {
-    console.log('Fetched attended events data:', eventsData);
-    setEvents(eventsData);
-  });
+  const handleCreate = (eventId)=>{
+    setActiveTab('managing');
+  }
 
-  // Fetch self-managed events data
-  fetchEventsData(currentUser.managed).then((eventsData) => {
-    console.log('Fetched managed events data:', eventsData);
-    setSelfEvents(eventsData);
-  });
-};
+  // Fetch updated events data after deletion
+  const fetchUpdatedEvents = () => {
+    // Call the function to fetch attended events data
+    fetchEventsData(currentUser.attended).then((eventsData) => {
+      console.log('Fetched attended events data:', eventsData);
+      setEvents(eventsData);
+    });
 
+    // Fetch self-managed events data
+    fetchEventsData(currentUser.managed).then((eventsData) => {
+      console.log('Fetched managed events data:', eventsData);
+      setSelfEvents(eventsData);
+    });
+  };
 
   useEffect(() => {
     // Call the function to fetch attended events data
@@ -88,7 +95,7 @@ const fetchUpdatedEvents = () => {
       console.log('Fetched attended events data:', eventsData);
       setEvents(eventsData)
     });
-    
+
     // Fetch self managed events data
     fetchEventsData(currentUser.managed).then((eventsData) => {
       console.log('Fetched managed events data:', eventsData);
@@ -138,7 +145,7 @@ const fetchUpdatedEvents = () => {
           <div className="row">
             {selfEvents && selfEvents.map((event, index) => (
               <div key={index} className="col-md-12 mb-4">
-                <Event event={event} onDelete={deleteEvent}/>
+                <Event event={event} onEdit={()=>handleEdit(event.id)} onDelete={()=>handleDelete(event.id)} />
               </div>
             ))}
           </div>
@@ -148,7 +155,7 @@ const fetchUpdatedEvents = () => {
           <div className="row">
             {events && events.map((event, index) => (
               <div key={index} className="col-md-12 mb-4">
-                <Event event={event} onDelete={deleteEvent} />
+                <Event event={event} onEdit={currentUser.managed.includes(event.id) ? null : ()=>handleEdit(event.id)} onDelete={()=>handleDelete(event.id)} />
               </div>
             ))}
           </div>
@@ -158,7 +165,7 @@ const fetchUpdatedEvents = () => {
           <Calendar user={currentUser} />
         )}
         {activeTab === 'create' && (
-          <CreateEvent user={currentUser} />
+          <CreateEvent user={currentUser} onCreate={handleCreate} />
         )}
       </div>
     </div>

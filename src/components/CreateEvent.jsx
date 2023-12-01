@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Event from "./Event";
 
-const CreateEvent = ({ user }) => {
+const CreateEvent = ({ user, onCreate }) => {
   const navigate = useNavigate();
   const [showPreview, setPreview] = useState(false);
 
@@ -89,7 +89,8 @@ const CreateEvent = ({ user }) => {
       });
 
       // Navigate to the home page
-      navigate("/");
+      onCreate(newEventRef.id);
+      //navigate("/");
     } catch (error) {
       console.error("Error creating event:", error);
       // Handle error
@@ -113,7 +114,7 @@ const CreateEvent = ({ user }) => {
       {showPreview && (
         <div className="floating-preview bg-light p-4 rounded mt-3">
           <h3>Preview:</h3>
-          <Event event={formData} onClose={() => setPreview(false)} />
+          <Event event={formData} isMin={false} onClose={() => setPreview(false)} />
         </div>
       )}
       <form onSubmit={handleSubmit} className="position-relative">
