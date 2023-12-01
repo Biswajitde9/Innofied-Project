@@ -1,0 +1,43 @@
+{
+    "profile": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "username": "event_planner_jd",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "address": {
+        "street": "123 Main Street",
+        "city": "Eventville",
+        "state": "Eventland",
+        "zipCode": "12345"
+      },
+      "companyName": "Elite Events",
+      "bio": "Passionate event planner with a keen eye for detail. Creating memorable experiences for clients is my forte.",
+      "socialMedia": {
+        "linkedin": "https://www.linkedin.com/in/johndoe",
+        "twitter": "https://twitter.com/johndoe",
+        "instagram": "https://www.instagram.com/johndoe_events"
+      },
+      "portfolio": [
+        {
+          "eventName": "Grand Gala 2022",
+          "eventDate": "2022-12-15",
+          "description": "A luxurious gala featuring top-notch entertainment and gourmet dining.",
+          "images": [
+            "https://example.com/images/gala1.jpg",
+            "https://example.com/images/gala2.jpg"
+          ]
+        },
+        {
+          "eventName": "Corporate Summit 2023",
+          "eventDate": "2023-04-10",
+          "description": "Bringing together industry leaders for insightful discussions and networking.",
+          "images": [
+            "https://example.com/images/summit1.jpg",
+            "https://example.com/images/summit2.jpg"
+          ]
+        }
+      ]
+    }
+  }
+  
