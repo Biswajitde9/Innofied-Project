@@ -243,8 +243,7 @@ const CreateEvent = ({ user }) => {
               className="form-control"
             />
           </div>
-        </div>
-        
+        </div> 
       </form>
     </div>
   );
