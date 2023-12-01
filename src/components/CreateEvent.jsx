@@ -52,7 +52,7 @@ const CreateEvent = ({ user }) => {
       });
     }
   };
-  
+
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -97,7 +97,26 @@ const CreateEvent = ({ user }) => {
   };
   return (
     <div className="container mt-5">
-      <form onSubmit={handleSubmit}>
+        <div className="row">
+          <div className="mb-3">
+            <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary">
+              Preview Event
+            </button>
+          </div>
+          <div className="mb-3">
+            <button type="submit" className="btn btn-primary">
+              Create Event
+            </button>
+          </div>
+        </div>
+
+      {showPreview && (
+        <div className="floating-preview bg-light p-4 rounded mt-3">
+          <h3>Preview:</h3>
+          <Event event={formData} isPreview={true} onDelete={() => setPreview(false)} />
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="position-relative">
         <div className="mb-3">
           <label className="form-label">Event Name:</label>
           <input
@@ -225,27 +244,8 @@ const CreateEvent = ({ user }) => {
             />
           </div>
         </div>
-        <div className="row">
-            <div className="mb-3">
-            <button onClick={()=>{setPreview(!showPreview)}} className="btn btn-primary">
-                Preview Event
-            </button>
-            </div>
-            <div className="mb-3">
-            <button type="submit" className="btn btn-primary">
-                Create Event
-            </button>
-            </div>
-        </div>
-        {showPreview &&
-            <>
-            <h3>Preview: </h3>
-            <div className="mb-3">
-            <Event event={formData} isPreview={true} onDelete={()=>{setPreview(false)}} />
-            </div>
-            </>
-        }
-        </form>
+        
+      </form>
     </div>
   );
 };

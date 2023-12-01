@@ -1,7 +1,7 @@
 import React from 'react';
 import { db } from '../firebase-init';
 import { doc, deleteDoc } from 'firebase/firestore';
-const Event = ({ event,onDelete }) => {
+const Event = ({ event, onDelete }) => {
   console.log(event);
   const {
     name,
@@ -18,13 +18,13 @@ const Event = ({ event,onDelete }) => {
   } = event;
 
   const statusTextArray = ['PLANNED', 'DELAYED', 'STARTED', 'ENDED', 'CANCELLED'];
-  const statusBgColors = {
-    'PLANNED': '#2196F3',     // Blue
-    'DELAYED': '#FFC107',     // Amber
-    'STARTED': '#4CAF50',     // Green
-    'ENDED': '#FF5722',       // Deep Orange
-    'CANCELLED': '#F44336'    // Red
-  };
+  const statusBgColors = [
+    '#2196F3',     // Blue
+    '#FFC107',     // Amber
+    '#4CAF50',     // Green
+    '#FF5722',       // Deep Orange
+    '#F44336'    // Red
+  ];
   const statusText = statusTextArray[status] || 'UNKNOWN';
 
   // const handleDelete = async () => {
@@ -43,15 +43,17 @@ const Event = ({ event,onDelete }) => {
 
   return (
     <div className="container mt-4">
-      <div className="row" style={{background:`${statusBgColors[status]}44`,border:`solid 2px ${statusBgColors[status]}`}}>
+      <div className="row px-5 pb-5" style={{borderRadius:8,background:`${statusBgColors[status]}44`,border:`solid 2px ${statusBgColors[status]}`}}>
+        <div className="button-row mb-5 d-flex justify-content-end">
+          <button onClick={()=>onDelete(event.id)} className="btn btn-danger" style={{borderTopLeftRadius:0,borderTopRightRadius:0,width:40}}>x</button>
+        </div>
         <div className="col-12 col-sm-4" >
           <ul className="list-unstyled">
             {media_url.map((url, index) => (
               <li key={index}>
-                <img src={url}  style={{maxHeight:"280px",maxWidth:"250px",objectFit:"contain"}} alt={`Media ${index + 1}`} className="img-fluid" />
+                <img src={url}  style={{height:"340px",maxWidth:"250px",objectFit:"cover"}} alt={`Media ${index + 1}`} className="img-fluid" />
               </li>
             ))}
-            <button onClick={()=>onDelete(event.id)} className="btn btn-danger mt-4">x</button>
           </ul>
         </div>
         <div className="col-12 col-sm-8">
