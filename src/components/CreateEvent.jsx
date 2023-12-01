@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import Event from "./Event";
 
-const CreateEvent = ({ user, onCreate }) => {
+const CreateEvent = ({ user, onCreate, isEdit }) => {
   const navigate = useNavigate();
   const [showPreview, setPreview] = useState(false);
 

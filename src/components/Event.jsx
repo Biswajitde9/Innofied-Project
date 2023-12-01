@@ -74,7 +74,7 @@ const Event = ({ event, isMin, onEdit, onClose, onDelete }) => {
       <div className="row px-5 pb-5 justify-content-start" style={{ borderRadius: 8, background: `${statusBgColors[status]}22`, border: `solid 2px ${statusBgColors[status]}` }}>
         <div className="button-row mb-5 d-flex justify-content-end">
           {onEdit &&
-            <button onClick={() => { onClose(); onEdit() }}
+            <button onClick={() => { onEdit() }}
               className="btn btn-warning me-2"
               style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaPen color='white' />
             </button>

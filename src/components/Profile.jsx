@@ -7,7 +7,7 @@ import CreateEvent from './CreateEvent';
 import { db } from "../firebase-init";
 
 //Import all the required functions from fireStore
-import { collection, getDocs, where, query, deleteDoc, doc } from "firebase/firestore";
+import { collection, documentId, getDocs, where, query, deleteDoc, doc } from "firebase/firestore";
 
 const Profile = ({ currentUser }) => {
   const [events, setEvents] = useState();
@@ -17,33 +17,28 @@ const Profile = ({ currentUser }) => {
   // Fetch events data from the "Events" collection based on the "attended" array
   const fetchEventsData = async (eventIDs = []) => {
     const eventsData = [];
+    if (eventIDs.length == 0) return eventsData;
 
-    // Loop through each event reference in the "attended" array
-    for (const eventId of eventIDs) {
-      try {
-        // Create a query to find events based on the "attended" array
-        const eventsCollection = collection(db, 'Events');
-        const q = query(eventsCollection, where('uid', '==', currentUser.uid));
+    // Create a query to find events based on the "attended" array
+    const eventsCollection = collection(db, 'Events');
+    const q = query(eventsCollection, where(documentId(), 'in', eventIDs));
 
-        // Execute the query
-        const querySnapshot = await getDocs(q);
+    try {
+      // Execute the query
+      const querySnapshot = await getDocs(q);
+      const eventsData = [];
+    
+      // Loop through the query results and add event data to eventsData array
+      querySnapshot.forEach((doc) => {
+        eventsData.push({ id: doc.id, ...doc.data() });
+      });
 
-        // Loop through the query results and add event data to eventsData array
-        querySnapshot.forEach((doc) => {
-          eventsData.push({
-            id: doc.id,
-            ...doc.data()
-          });
-        });
-
-        return eventsData;
-      } catch (error) {
-        console.error('Error fetching events data:', error);
-        // Handle error
-        return eventsData; // Return an empty array or handle error as needed
-      }
+      return eventsData;
+    } catch (error) {
+      console.error('Error fetching events data:', error);
+      // Return an empty array or handle error as needed
     }
-
+    
     return eventsData;
   };
 
@@ -90,17 +85,7 @@ const Profile = ({ currentUser }) => {
   };
 
   useEffect(() => {
-    // Call the function to fetch attended events data
-    fetchEventsData(currentUser.attended).then((eventsData) => {
-      console.log('Fetched attended events data:', eventsData);
-      setEvents(eventsData)
-    });
-
-    // Fetch self managed events data
-    fetchEventsData(currentUser.managed).then((eventsData) => {
-      console.log('Fetched managed events data:', eventsData);
-      setSelfEvents(eventsData)
-    });
+    fetchUpdatedEvents();
   }, [currentUser])
 
   return (
