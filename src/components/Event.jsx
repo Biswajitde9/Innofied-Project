@@ -4,6 +4,7 @@ import { FaMapMarked } from 'react-icons/fa';
 import { db } from '../firebase-init';
 import { doc, deleteDoc } from 'firebase/firestore';
 import Maps from './Maps';
+import Like from "./Like";
 const Event = ({ event, onDelete }) => {
   console.log(event);
   const {
@@ -60,6 +61,7 @@ const Event = ({ event, onDelete }) => {
                 <img src={url} style={{borderRadius:8, maxHeight:"100%",maxWidth:"100%",objectFit:"cover"}} alt={`Media ${index + 1}`} className="img-fluid" />
               </li>
             ))}
+            <Like/>
           </ul>
         </div>
 

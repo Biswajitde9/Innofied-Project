@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { FcLike } from "react-icons/fc";
 
 const LikeButton = () => {
   const [likes, setLikes] = useState(0);
@@ -11,7 +12,7 @@ const LikeButton = () => {
   return (
     <div className="mt-3">
       <button className="btn btn-primary" onClick={handleLikeClick}>
-        Like {likes > 0 && `(${likes})`}
+      <FcLike />{likes > 0 && `(${likes})`}
       </button>
     </div>
   );
