@@ -5,6 +5,7 @@ import { db } from '../firebase-init';
 import { doc, deleteDoc } from 'firebase/firestore';
 import Maps from './Maps';
 import Like from "./Like";
+import Comment from "./Comment";
 const Event = ({ event, onDelete }) => {
   console.log(event);
   const {
@@ -62,6 +63,7 @@ const Event = ({ event, onDelete }) => {
               </li>
             ))}
             <Like/>
+            <Comment/>
           </ul>
         </div>
 
