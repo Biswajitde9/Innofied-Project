@@ -11,7 +11,6 @@ const Event = ({ event,onDelete }) => {
     address,
     location,
     media_url,
-    post_event,
     attendees,
     rating,
     social,
@@ -19,6 +18,13 @@ const Event = ({ event,onDelete }) => {
   } = event;
 
   const statusTextArray = ['PLANNED', 'DELAYED', 'STARTED', 'ENDED', 'CANCELLED'];
+  const statusBgColors = {
+    'PLANNED': '#2196F3',     // Blue
+    'DELAYED': '#FFC107',     // Amber
+    'STARTED': '#4CAF50',     // Green
+    'ENDED': '#FF5722',       // Deep Orange
+    'CANCELLED': '#F44336'    // Red
+  };
   const statusText = statusTextArray[status] || 'UNKNOWN';
 
   // const handleDelete = async () => {
@@ -37,7 +43,7 @@ const Event = ({ event,onDelete }) => {
 
   return (
     <div className="container mt-4">
-      <div className="row">
+      <div className="row" style={{background:`${statusBgColors[status]}44`,border:`solid 2px ${statusBgColors[status]}`}}>
         <div className="col-12 col-sm-4" >
           <ul className="list-unstyled">
             {media_url.map((url, index) => (

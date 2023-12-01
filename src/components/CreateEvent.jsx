@@ -241,7 +241,7 @@ const CreateEvent = ({ user }) => {
             <>
             <h3>Preview: </h3>
             <div className="mb-3">
-            <Event event={formData} />
+            <Event event={formData} isPreview={true} onDelete={()=>{setPreview(false)}} />
             </div>
             </>
         }
