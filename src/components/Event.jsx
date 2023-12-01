@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { FaFacebookSquare, FaMapPin, FaTwitterSquare, FaInstagramSquare, FaPeopleArrows, FaUserFriends, FaUserCircle, FaUsersCog, FaUser, FaUserAlt, FaLocationArrow, FaMapMarker, FaMapMarkerAlt } from 'react-icons/fa';
-import { FaMapMarked } from 'react-icons/fa';
+import { FaFacebookSquare, FaMapPin, FaTwitterSquare, FaInstagramSquare, FaPeopleArrows, FaUserFriends, FaUserCircle, FaUsersCog, FaUser, FaUserAlt, FaLocationArrow, FaMapMarker, FaMapMarkerAlt, FaStar, FaStarHalfAlt, FaStarHalf, FaCalendarWeek, FaCalendarCheck, FaCalendar, FaCalendarDay, FaCalendarAlt, FaCalendarTimes, FaDumpster, FaRecycle, FaEraser, FaCalendarMinus, FaWindowClose, FaRegWindowClose, FaCross, FaWindowMinimize, FaCaretSquareUp, FaAngleDoubleUp, FaPencilAlt, FaEdit, FaRegEdit, FaUserEdit, FaPen } from 'react-icons/fa';
+import { FaMapMarked, FaHeart } from 'react-icons/fa';
 import { db } from '../firebase-init';
 import { doc, deleteDoc } from 'firebase/firestore';
 import Maps from './Maps';
-const Event = ({ event, onDelete }) => {
+import Alert from './Alert';
+const Event = ({ event, isMin, onEdit, onClose, onDelete }) => {
   console.log(event);
   const {
     name,
@@ -20,7 +21,10 @@ const Event = ({ event, onDelete }) => {
     status,
   } = event;
 
-  const [showLocation,setLocation] = useState(false);
+  const [showMin, setMin] = useState(isMin);
+  const [showLocation, setLocation] = useState(false);
+  const [showAlert, setAlert] = useState(false);
+
   const statusTextArray = ['PLANNED', 'DELAYED', 'STARTED', 'ENDED', 'CANCELLED'];
   const statusBgColors = [
     '#2196F3',     // Blue
@@ -29,7 +33,17 @@ const Event = ({ event, onDelete }) => {
     '#FF5722',       // Deep Orange
     '#F44336'    // Red
   ];
-  const statusText = (statusTextArray[status] != null) || 'UNKNOWN';
+  const statusText = statusTextArray[status] || 'UNKNOWN';
+
+  let stars = []
+  for (var i = 0; i + 1 <= Math.floor(rating); i++) {
+    stars.push(<FaStar key={i} className='mb-1' style={{ height: 20, width: 20, color: "gold" }}></FaStar>)
+  }
+  if (rating - Math.floor(rating) > 0.3) stars.push(<FaStarHalf style={{ color: "yellow" }} />)
+  for (var i = 0; i + 1 <= (5 - Math.floor(rating)); i++) {
+    stars.push(<FaStar key={5 + i} className='mb-1' style={{ height: 20, width: 20, color: "#aaa" }}></FaStar>)
+  }
+
 
   // const handleDelete = async () => {
   //   try {
@@ -46,42 +60,57 @@ const Event = ({ event, onDelete }) => {
   // };
 
   return (
-    <div className="container mt-4">
-      {showLocation && <Maps latitude={location[0]} longitude={location[1]} onClose={()=>setLocation(false)}/>}
-      <div className="row px-5 pb-5 justify-content-start" style={{borderRadius:8,background:`${statusBgColors[status]}22`, border:`solid 2px ${statusBgColors[status]}`}}>
+    <div className="container mt-4 min overflow-hidden">
+      {showLocation && <Maps latitude={location[0]} longitude={location[1]} onClose={() => setLocation(false)} />}
+      {showAlert && onDelete &&
+        <Alert title={"DELETE CONFIRMATION"} onAccept={() => { onDelete(event.id); setAlert(false) }} onClose={() => setAlert(false)}
+          message={<>
+            Are you sure you wish to permanenty delete the event <span className="text-danger">{name}</span>?
+          </>}
+        />}
+      <div className="row px-5 pb-5 justify-content-start" style={{ borderRadius: 8, background: `${statusBgColors[status]}22`, border: `solid 2px ${statusBgColors[status]}` }}>
         <div className="button-row mb-5 d-flex justify-content-end">
-          <button onClick={()=>onDelete(event.id)} className="btn btn-danger" style={{borderTopLeftRadius:0,borderTopRightRadius:0,width:40}}>x</button>
+          {onEdit && 
+            <button onClick={() => { onClose(); onEdit(event.id) }} 
+              className="btn btn-warning me-2" 
+              style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaPen color='white'/>
+            </button>
+          }
+          {onDelete && <button onClick={() => setAlert(true)} className="me-2 btn btn-danger" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaCalendarTimes /></button>}
+          <button onClick={() => setAlert(true)} className="btn btn-primary me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaAngleDoubleUp /></button>
         </div>
 
         <div className="col-12 col-md-4" >
           <ul className="list-unstyled">
             {media_url.map((url, index) => (
               <li key={index}>
-                <img src={url} style={{borderRadius:8, maxHeight:"100%",maxWidth:"100%",objectFit:"cover"}} alt={`Media ${index + 1}`} className="img-fluid" />
+                <img src={url} style={{ borderRadius: 8, maxHeight: "100%", maxWidth: "100%", objectFit: "cover" }} alt={`Media ${index + 1}`} className="img-fluid" />
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="col-12 col-md-8" style={{minHeight:340}}>
-          <h2>{name}</h2>
-          <p>From {new Date(start_date).toLocaleDateString()} to {new Date(end_date).toLocaleDateString()}</p>
-          <p>{desc}</p>
-          <p><FaMapMarkerAlt style={{color:"orange",height:38,width:38,borderRadius:5}} onClick={()=>setLocation(true)}/><strong>Venue:</strong> {address}.</p>
-          <span>
-          <strong>Status:</strong> {statusText}
-          </span>
-          <span><strong>Rating:</strong> {rating}</span>
-          <span><strong>Attendees:</strong> {attendees}</span>
-          <div className='mt-2 d-flex flex-flow-column'>
-            <FaUser style={{border:"solid white 2px",color:"green", background:"lightgreen",height:40,width:40,borderRadius:5}} className="me-2"/>
-            {}
+        <div className="col-12 col-md-8" style={{ minHeight: 340, lineHeight: 2 }}>
+          <h1 className='align-items-center'>{name} <span style={{ textWrap: "nowrap" }}>{stars}</span></h1>
+          <div className='mt-2 d-flex flex-flow-column align-items-center'>
+            <FaUser className="icon" style={{ color: "green" }} />
+            <span style={{ weight: "500", paddingRight: "6px" }}>{attendees}</span> people attending.
           </div>
+          <div className='mt-2 d-flex flex-flow-column align-items-center'>
+            <FaMapMarkerAlt className="icon" style={{ color: "orange" }} onClick={() => setLocation(true)} />
+            <b style={{ paddingRight: "6px" }}>Venue:</b> {address}.
+          </div>
+          <div className='mt-2 d-flex flex-flow-column align-items-center'>
+            <FaCalendarCheck className="icon" style={{ color: "skyblue" }} /> <b style={{ paddingRight: "6px" }}>{new Date(start_date).toLocaleDateString()} - {new Date(end_date).toLocaleDateString()}</b>
+          </div>
+          <p style={{ lineHeight: "1.5" }} className='mt-2'>{desc}</p>
+
+          <h3>Follow the event:</h3>
           <div className='mt-2'>
             {/* Assuming keys are "facebook", "instagram", and "twitter" */}
-            <a href={social.facebook}><FaFacebookSquare style={{background:"white",height:40,width:40,borderRadius:5}} className="me-2"/></a>
-            <a href={social.twitter}><FaTwitterSquare style={{background:"white",color:"black",height:40,width:40,borderRadius:5}} className="me-2"/></a>
-            <a href={social.instagram}><FaInstagramSquare  style={{background:"white", color:"red",height:40,width:40,borderRadius:5}} className="me-2"/></a>
+            <a href={social.facebook}><FaFacebookSquare style={{ background: "white", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
+            <a href={social.twitter}><FaTwitterSquare style={{ background: "white", color: "black", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
+            <a href={social.instagram}><FaInstagramSquare style={{ background: "white", color: "red", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
           </div>
         </div>
       </div>

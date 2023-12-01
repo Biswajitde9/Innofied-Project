@@ -18,3 +18,46 @@
   background: white;
   box-shadow: 0 14px 18px rgba(0, 0, 0, 0.2);
 }
+
+.icon {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
+
+.icon.bordered {
+  border:solid white 2px; 
+  background:lightgreen;
+  border-radius:5;
+}
+
+/* --------------------------- Events --------------------- */
+.container.min * {
+  padding: 0!important;
+  margin: 0!important;
+  border-radius: 0!important;
+  padding-right: 4px!important;
+  border: none!important;
+}
+
+.container.min {
+  height: 50px;
+  border: solid gray thin!important;
+}
+
+.container.min .button-row {
+  width: 140px;
+  margin-left: auto!important;
+  margin-right: 0!important;
+}
+
+.container.min .button-row button {
+  position: absolute;
+  height: 40px;
+  width: 40px!important;
+  margin-top: 0px!important;
+  padding-left: 8px!important;
+}
+.container.min .button-row button svg {
+  fill:white;
+}

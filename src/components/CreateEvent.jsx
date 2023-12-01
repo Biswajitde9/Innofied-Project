@@ -113,7 +113,7 @@ const CreateEvent = ({ user }) => {
       {showPreview && (
         <div className="floating-preview bg-light p-4 rounded mt-3">
           <h3>Preview:</h3>
-          <Event event={formData} isPreview={true} onDelete={() => setPreview(false)} />
+          <Event event={formData} onClose={() => setPreview(false)} />
         </div>
       )}
       <form onSubmit={handleSubmit} className="position-relative">
