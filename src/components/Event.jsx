@@ -4,7 +4,10 @@ import { FaMapMarked, FaHeart } from 'react-icons/fa';
 import { db } from '../firebase-init';
 import { doc, deleteDoc } from 'firebase/firestore';
 import Maps from './Maps';
+import Like from "./Like";
 import Alert from './Alert';
+import Comment from "./Comment";
+
 const Event = ({ event, isMin, onEdit, onClose, onDelete }) => {
   console.log(event);
   const {
@@ -77,7 +80,7 @@ const Event = ({ event, isMin, onEdit, onClose, onDelete }) => {
             </button>
           }
           {onDelete && <button onClick={() => setAlert(true)} className="me-2 btn btn-danger" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaCalendarTimes /></button>}
-          <button onClick={() => setAlert(true)} className="btn btn-primary me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaAngleDoubleUp /></button>
+          <button onClick={() => {onClose?onClose():setMin(!showMin)}} className="btn btn-primary me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 40 }}><FaAngleDoubleUp /></button>
         </div>
 
         <div className="col-12 col-md-4" >
@@ -111,6 +114,8 @@ const Event = ({ event, isMin, onEdit, onClose, onDelete }) => {
             <a href={social.facebook}><FaFacebookSquare style={{ background: "white", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
             <a href={social.twitter}><FaTwitterSquare style={{ background: "white", color: "black", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
             <a href={social.instagram}><FaInstagramSquare style={{ background: "white", color: "red", height: 40, width: 40, borderRadius: 5 }} className="me-2" /></a>
+            <Like/>
+            <Comment/>
           </div>
         </div>
       </div>
