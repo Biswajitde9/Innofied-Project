@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Now you can use this component with different numbers of rows and columns by passing numRows and numCols as props:
 //{/* <CalendarGrid numRows={5} numCols={7} /> */}
 
-const CalendarGrid = ({ numRows, numCols }) => {
+const Grid = ({ numRows, numCols }) => {
   const weeks = Array.from({ length: numRows }, (_, weekIndex) =>
     Array.from({ length: numCols }, (_, dayIndex) => weekIndex * numCols + dayIndex + 1)
   );
@@ -32,4 +32,4 @@ const CalendarGrid = ({ numRows, numCols }) => {
   );
 };
 
-export default CalendarGrid;
+export default Grid;
