@@ -8,6 +8,7 @@ import Signup from "./components/Signup";
 import Calendar from "./components/Calendar";
 import Profile from "./components/Profile";
 import Header from "./components/Header"
+import "./App.css"
 
 const App = () => {
   // State to track login status
