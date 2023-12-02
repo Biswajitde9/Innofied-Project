@@ -16,6 +16,7 @@ const Profile = ({ currentUser }) => {
 
   // Fetch events data from the "Events" collection based on the "attended" array
   const fetchEventsData = async (eventIDs = []) => {
+    console.log("EVent ID pass Karo",eventIDs);
     const eventsData = [];
     if (eventIDs.length == 0) return eventsData;
 
@@ -65,7 +66,7 @@ const Profile = ({ currentUser }) => {
     setActiveTab('managing');
   }
 
-  const handleCreate = (eventId)=>{
+  const handleCreate = ()=>{
     setActiveTab('managing');
   }
 

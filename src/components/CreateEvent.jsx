@@ -73,6 +73,7 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
     e.preventDefault();
 
     try {
+      console.log(user);
       // Add a new document to the "Events" collection
       const eventsCollection = collection(db, "Events");
       const newEventRef = await addDoc(eventsCollection, {
@@ -85,7 +86,7 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
       // Update the "managed" array of the user with the new event ID
       const userDocRef = doc(db, "Users", user.uid);
       await updateDoc(userDocRef, {
-        managed: arrayUnion(newEventRef.id),
+        managed:await arrayUnion(newEventRef.id),
       });
 
       // Navigate to the home page
@@ -104,11 +105,11 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
               Preview Event
             </button>
           </div>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <button type="submit" className="btn btn-primary">
               Create Event
             </button>
-          </div>
+          </div> */}
         </div>
 
       {showPreview && (
@@ -118,6 +119,11 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
         </div>
       )}
       <form onSubmit={handleSubmit} className="position-relative">
+      <div className="mb-3">
+            <button type="submit" className="btn btn-primary">
+              Create Event
+            </button>
+          </div>
         <div className="mb-3">
           <label className="form-label">Event Name:</label>
           <input
