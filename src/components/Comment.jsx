@@ -3,9 +3,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
-const Comment = () => {
+const Comment = ({data}) => {
   const [comment, setComment] = useState('');
-  const [commentsList, setCommentsList] = useState([]);
+  const [commentsList, setCommentsList] = useState(data?data:[]);
   const [editIndex, setEditIndex] = useState(null);
 
   const handleAddComment = () => {
@@ -35,22 +35,26 @@ const Comment = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <div className="mb-3">
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          className="form-control"
-          placeholder="Type your comment..."
-        />
+    <div className="container mt-4 ps-0">
+      <div className='row'>
+        <div className="col-10">
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="form-control"
+            placeholder="Type your comment..."
+          />
+        </div>
+        <div className='col-2'>
+          <button onClick={handleAddComment} className="btn btn-primary mb-3">
+            {editIndex !== null ? 'Edit' : 'Add'}
+          </button>
+        </div>
       </div>
-      <button onClick={handleAddComment} className="btn btn-primary mb-3">
-        {editIndex !== null ? 'Edit' : 'Add'}
-      </button>
 
       <div>
-        <h3>Comments:</h3>
+        {commentsList.length>0 ? <h3>Comments:</h3> : <h6>No one has commented yet! Be the first!</h6>}
         <ul className="list-group">
           {commentsList.map((c, index) => (
             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">

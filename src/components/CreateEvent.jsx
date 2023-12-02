@@ -8,11 +8,9 @@ import {
   serverTimestamp,
   arrayUnion,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
 import Event from "./Event";
 
 const CreateEvent = ({ user, onCreate, isEdit }) => {
-  const navigate = useNavigate();
   const [showPreview, setPreview] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -23,15 +21,11 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
     address: "",
     location: [0, 0], // Assuming initial location
     media_url: [],
-    post_event: "",
-    attendees: 0,
-    rating: 0,
     social: {
       facebook: "",
       twitter: "",
       instagram: "",
     },
-    status: 0,
   });
 
   const handleInputChange = (e) => {
@@ -98,18 +92,18 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
   };
   return (
     <div className="container mt-5">
-        <div className="row">
-          <div className="mb-3">
-            <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary">
-              Preview Event
-            </button>
-          </div>
-          <div className="mb-3">
-            <button type="submit" className="btn btn-primary">
-              Create Event
-            </button>
-          </div>
+      <div className="row">
+        <div className="mb-3">
+          <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary">
+            Preview Event
+          </button>
         </div>
+        <div className="mb-3">
+          <button type="submit" className="btn btn-primary">
+            Create Event
+          </button>
+        </div>
+      </div>
 
       {showPreview && (
         <div className="floating-preview bg-light p-4 rounded mt-3">
@@ -173,7 +167,7 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
           />
         </div>
         <div className="mb-3">
-          <label className="form-label">Location (Latitude, Longitude):</label>
+          <label className="form-label">Location:</label>
           <input
             type="text"
             name="location"
@@ -190,25 +184,6 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
             name="media_url"
             value={formData.media_url.join(", ")}
             onChange={handleMediaChange}
-            className="form-control"
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Post Event:</label>
-          <textarea
-            name="post_event"
-            value={formData.post_event}
-            onChange={handleInputChange}
-            className="form-control"
-          ></textarea>
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Rating:</label>
-          <input
-            type="number"
-            name="rating"
-            value={formData.rating}
-            onChange={handleInputChange}
             className="form-control"
           />
         </div>
@@ -244,7 +219,7 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
               className="form-control"
             />
           </div>
-        </div> 
+        </div>
       </form>
     </div>
   );

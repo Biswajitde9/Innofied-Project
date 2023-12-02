@@ -32,38 +32,189 @@
 }
 
 /* --------------------------- Events --------------------- */
+
+.container, 
+.container svg, 
+.container img {
+  transition: all 300ms ease-in-out;
+}
+
+.container.min {
+  --min-height: 50px;
+  /* height: var(--min-height); */
+  border: solid gray thin!important;
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+}
+
+.container.min .event-social, 
+.container.min .event-details {
+  min-height: var(--min-height)!important;
+  height: var(--min-height)!important;;
+  align-items: center;
+  display: flex;
+}
+.container .event-social {
+  display: flex;
+  align-items: center;
+}
+
+.container.min img {
+  /* width: var(--min-height);
+  height: var(--min-height); */
+  /* object-fit: cover;
+  image-rendering: pixelated; */
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1;
+}
+.container.min .event-image {
+  max-height: var(--min-height);
+  /* height: var(--min-height)!important;
+  width: var(--min-height)!important; */
+}
+.container.min .event-image ul, 
+.container.min .event-image li {
+  height: 100%;
+  width: fit-content;
+  aspect-ratio: 1;
+}
+
+.container.min .row {
+  flex-direction: row!important;
+}
+
+.container.min h1 {
+  width: 100%;
+  font-size: x-large;
+}
+
+@media (max-width:992px){
+.container.min h1 {
+  font-size: large;
+  text-wrap: wrap;
+}
+}
+
+.container.min .event-desc,
+.container.min .event-date,
+.container.min .event-loc,
+.container.min .event-details h3,
+.container.min .event-people {
+  /* display: none!important; */
+}
+
 .container.min * {
-  padding: 0!important;
-  margin: 0!important;
+  padding-bottom: 0!important;
+  margin-top: 0!important;
+  margin-bottom: 0!important;
+  /* margin-left: 0!important; */
   border-radius: 0!important;
   padding-right: 4px!important;
   border: none!important;
 }
 
-.container.min {
-  height: 50px;
-  border: solid gray thin!important;
-}
-
-.container.min .button-row {
-  width: 140px;
-  margin-left: auto!important;
-  margin-right: 0!important;
-}
+/* .container.min .button-row {
+  min-width: calc(var(--min-height) * 180px);
+  width: calc(var(--min-height) * 180px);
+  display: block!important;
+} */
 
 .container.min .button-row button {
-  position: absolute;
-  height: 40px;
-  width: 40px!important;
+  /* position: absolute; */
+  height: var(--min-height);
+  width: var(--min-height)!important;
+  margin-right: 4px!important;
   margin-top: 0px!important;
   padding-left: 8px!important;
 }
-.container.min .button-row button svg {
+.container.max .event-ctrl:hover {
+  padding-top: 50px;
+}
+.container.min .event-ctrl svg {
   fill:white;
+  scale: 1.5;
+}
+
+.container.min .event-social a {
+  /* width: 36px;
+  height: 36px;
+  margin-right: 4px!important; */
 }
 
 .event-ctrl {
+  transition: all 200ms ease-in-out;
   border-top-left-radius: 0;
   border-top-right-radius: 0; 
-  width: 40;
+  height: 100%;
+}
+
+.event-social .like-btn svg {
+  margin-right: 4px!important;
+}
+* button:disabled {
+  border: solid thin gray!important;
+  background: darkgray!important;
+  color: gray!important;
+  filter: grayscale(100%);
+}
+.event-social .like-btn {
+  background-color: crimson;
+  height: 35px;
+  border-radius: 4px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-color: red;
+}
+.event-social .like-btn:hover {
+  background-color: red;
+}
+
+svg {
+  clip-path: content-box;
+}
+
+.nav-tabs {
+  overflow: scroll;
+  flex-wrap: nowrap;
+  overflow-y: clip;
+}
+.nav-tabs button {
+  text-wrap: nowrap;
+}
+
+* {
+  user-select: none;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #555 #ddd; /* Firefox */
+}
+
+
+/* For WebKit browsers (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #555;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ddd;
+}
+
+@media (max-width:768px) {
+  .evt-container {
+    max-width: 720px;
+    overflow: clip;
+  }
+  .evt-container > div {
+    overflow-x: scroll;
+  }
+  .container.min  {
+    min-width: 768px;
+  }
 }

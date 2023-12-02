@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Calendar from './Calendar';
-import Event from './Event'
+import Event, { StatusTextArray } from './Event'
 import CreateEvent from './CreateEvent';
+import Alert from './Alert';
 
 //Import fireStore reference from frebaseInit file
 import { db } from "../firebase-init";
@@ -13,6 +14,7 @@ const Profile = ({ currentUser }) => {
   const [events, setEvents] = useState();
   const [selfEvents, setSelfEvents] = useState();
   const [activeTab, setActiveTab] = useState('managing');
+  const [alert, setAlert] = useState(null);
 
   // Fetch events data from the "Events" collection based on the "attended" array
   const fetchEventsData = async (eventIDs = []) => {
@@ -89,7 +91,7 @@ const Profile = ({ currentUser }) => {
   }, [currentUser])
 
   return (
-    <div className="container mt-5">
+    <div className="container my-5">
       <ul className="nav nav-tabs">
         <li className="nav-item">
           <button
@@ -127,20 +129,110 @@ const Profile = ({ currentUser }) => {
 
       <div className="mt-3">
         {activeTab === 'managing' && (
-          <div className="row">
+          <div className="row evt-container">
             {selfEvents && selfEvents.map((event, index) => (
-              <div key={index} className="col-md-12 mb-4">
-                <Event event={event} onEdit={()=>handleEdit(event.id)} onDelete={()=>handleDelete(event.id)} />
+              <div key={index} className="col-md-12">
+                <Event event={event} 
+                  isMin={true} 
+                  onEdit={()=>handleEdit(event.id)} 
+                  onDelete={()=>{
+                    //get event details
+                    let message = "";
+                    switch(StatusTextArray[event.status]){
+                      case 'PLANNED': 
+                        message = <>
+                          Are you sure you wish to delete the planned event <span className="text-danger">{event.name}</span>?
+                          If you are trying to delay the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                      case 'DELAYED': break;
+                        message = <>
+                          Are you sure you wish to delete the event <span className="text-danger">{event.name}</span>?
+                          All participants will be notified.
+                        </>
+                        break;
+                      case 'STARTED': break;
+                        message = <>
+                          Are you sure you wish to delete the ongoing event <span className="text-danger">{event.name}</span>?
+                          If you are trying to delay the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                      case 'CANCELLED': case 'ENDED':
+                        message = <>
+                          Are you sure you wish to permanently cancel and delete the event <span className="text-danger">{event.name}</span>?
+                          If you are trying to restart the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                    }
+
+                    //make alert box
+                    setAlert(
+                      <Alert title={"DELETE CONFIRMATION"} 
+                        onAccept={() => { 
+                          handleDelete(event.id); 
+                          setAlert(null) 
+                        }} 
+                        onClose={() => setAlert(null)}
+                        message={message}
+                      />
+                    );
+                      
+                  }} />
               </div>
             ))}
           </div>
         )}
 
         {activeTab === 'attending' && (
-          <div className="row">
+          <div className="row evt-container">
             {events && events.map((event, index) => (
-              <div key={index} className="col-md-12 mb-4">
-                <Event event={event} onEdit={currentUser.managed.includes(event.id) ? null : ()=>handleEdit(event.id)} onDelete={()=>handleDelete(event.id)} />
+              <div key={index} className="col-md-12">
+                <Event event={event} 
+                  isMin={true} 
+                  onEdit={currentUser.managed.includes(event.id) ? ()=>handleEdit(event.id) : null} 
+                  onDelete={()=>{
+                    //get event details
+                    let message = "";
+                    switch(StatusTextArray[event.status]){
+                      case 'PLANNED': 
+                        message = <>
+                          Are you sure you wish to delete the planned event <span className="text-danger">{event.name}</span>?
+                          If you are trying to delay the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                      case 'DELAYED': break;
+                        message = <>
+                          Are you sure you wish to delete the event <span className="text-danger">{event.name}</span>?
+                          All participants will be notified.
+                        </>
+                        break;
+                      case 'STARTED': break;
+                        message = <>
+                          Are you sure you wish to delete the ongoing event <span className="text-danger">{event.name}</span>?
+                          If you are trying to delay the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                      case 'CANCELLED': case 'ENDED':
+                        message = <>
+                          Are you sure you wish to permanently cancel and delete the event <span className="text-danger">{event.name}</span>?
+                          If you are trying to restart the event you can cancel now choose that option instead. All participants will be notified.
+                        </>
+                        break;
+                    }
+
+                    //make alert box
+                    setAlert(
+                      <Alert title={"DELETE CONFIRMATION"} 
+                        onAccept={() => { 
+                          handleDelete(event.id); 
+                          setAlert(null) 
+                        }} 
+                        onClose={() => setAlert(null)}
+                        message={message}
+                      />
+                    );
+                      
+                  }} />
               </div>
             ))}
           </div>
@@ -153,6 +245,7 @@ const Profile = ({ currentUser }) => {
           <CreateEvent user={currentUser} onCreate={handleCreate} />
         )}
       </div>
+      {alert}
     </div>
   )
 }
