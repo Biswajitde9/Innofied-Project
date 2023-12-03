@@ -18,6 +18,33 @@ import {
     arrayUnion,
 } from "firebase/firestore";
 
+export const fetchUserData = async (userId ) => {
+    let userData = {};
+    if(userId==null){
+        return userData;
+    }
+    // Create a query to find events based on the "attended" array
+    const eventsCollection = collection(db, 'Users');
+    const q = query(eventsCollection, where(documentId(), '==', userId));
+
+    try {
+        // Execute the query
+        const querySnapshot = await getDocs(q);
+        const eventsData = [];
+
+        // Loop through the query results and add event data to eventsData array
+        querySnapshot.forEach((doc) => {
+            userData=({ id: doc.id, ...doc.data() });
+        });
+
+        return userData;
+    } catch (error) {
+        console.error('Error fetching events data:', error);
+        // Return an empty array or handle error as needed
+    }
+
+    return userData;
+};
 
 // Fetch events data from the "Events" collection based on the "attended" array
 export const fetchEventsData = async (eventIDs = []) => {
@@ -48,9 +75,22 @@ export const fetchEventsData = async (eventIDs = []) => {
 };
 
 export const deleteEventById = async (eventId) => {
-    // const eventRef = collection(db, 'Events', eventId);
-    await deleteDoc(doc(db, "Events", eventId.toString()));
-}
+    const eventRef = doc(db, 'Events', eventId.toString());
+
+    // Get the event data before deleting it
+    const eventSnapshot = await getDoc(eventRef);
+    const eventData = eventSnapshot.data();
+
+    // Delete the event
+    await deleteDoc(eventRef);
+
+    // Remove the event ID from the user's "managed" array
+    const userDocRef = doc(db, "Users", eventData.uid);
+    await updateDoc(userDocRef, {
+        managed: arrayRemove(eventId),
+    });
+};
+
 
 export const createEvent = async (eventData) => {
     // Add a new document to the "Events" collection
@@ -85,7 +125,7 @@ export const updateEventById = async (eventData) => {
 
 export const addComment = async (comment) => {
     const { message, eId, uId, uname } = comment;
-
+try{
     // Add a new comment to the "comments" array in the event document
     const eventDocRef = doc(db, "Events", eId);
     await updateDoc(eventDocRef, {
@@ -97,6 +137,9 @@ export const addComment = async (comment) => {
             created_at: serverTimestamp(),
         }),
     });
+}catch(e){
+    console.log("error",e);
+}
 };
 
 export const updateComment = async (comment) => {
@@ -170,6 +213,8 @@ export const addUser = async (formData) => {
     // Create a new document in the "Users" collection
     const newUserDocRef = await addDoc(usersCollection, {
         email: formData.email,
+        firstName:formData.firstName,
+        lastName:formData.secondName,
         username: formData.username,
         address: formData.address,
         password: formData.password,
@@ -198,7 +243,7 @@ export const userExists = async (email, phone, username) => {
     );
 
     const userQuerySnapshot = await getDocs(userQuery);
-    return userQuerySnapshot.size > 0;
+    return userQuerySnapshot.docs.length > 0;
 };
 
 // Function to check if a user with the provided email already exists
@@ -206,7 +251,8 @@ export const emailExists = async (email) => {
     const usersCollection = collection(db, "Users");
     const emailQuery = query(usersCollection, where("email", "==", email));
     const emailQuerySnapshot = await getDocs(emailQuery);
-    return emailQuerySnapshot.size > 0;
+    console.log(emailQuerySnapshot.docs);
+    return emailQuerySnapshot.docs.length > 0;
 };
 
 // Function to check if a user with the provided phone already exists
@@ -214,7 +260,10 @@ export const phoneExists = async (phone) => {
     const usersCollection = collection(db, "Users");
     const phoneQuery = query(usersCollection, where("phone", "==", phone));
     const phoneQuerySnapshot = await getDocs(phoneQuery);
-    return phoneQuerySnapshot.size > 0;
+
+    console.log("Phone Query Documents:", phoneQuerySnapshot.docs);
+
+    return phoneQuerySnapshot.docs.length > 0;
 };
 
 // Function to check if a user with the provided username already exists
@@ -222,5 +271,9 @@ export const usernameExists = async (username) => {
     const usersCollection = collection(db, "Users");
     const usernameQuery = query(usersCollection, where("username", "==", username));
     const usernameQuerySnapshot = await getDocs(usernameQuery);
-    return usernameQuerySnapshot.size > 0;
+
+    console.log("Username Query Documents:", usernameQuerySnapshot.docs);
+
+    return usernameQuerySnapshot.docs.length > 0;
 };
+

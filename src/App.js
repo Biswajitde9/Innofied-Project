@@ -68,7 +68,10 @@ const App = () => {
                 </div>
                 <div>
                   {isLoggedIn ? (
-                    <Profile currentUser={currentUser} />
+                    <Profile currentUser={currentUser}
+                    setCurrentUser={setCurrentUser}
+                    />
+
                   ) 
                   : <Calendar />
                 }

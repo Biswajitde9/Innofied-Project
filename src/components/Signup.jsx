@@ -30,12 +30,15 @@ const Signup = ({ onSignup }) => {
     });
   };
 
-  const validateFields = () => {
+  const validateFields = async () => {
     // Add your validation logic here and update warnings state accordingly
+    let emailExist = await emailExists(formData.email);
+    let phoneExist =await phoneExists(formData.phone) ;
+    let usernameExist =await usernameExists(formData.username)
     const newWarnings = {
-      email: emailExists(formData.email) ? "Email already in use." : "",
-      phone: phoneExists(formData.phone) ? "Phone number already in use." : "",
-      username: usernameExists(formData.username) ? "Username already in use." : "",
+      email:emailExist  ? "Email already in use." : "",
+      phone:phoneExist  ? "Phone number already in use." : "",
+      username: usernameExist ? "Username already in use." : "",
       passwordMatch: formData.password !== formData.confirmPassword ? "Passwords do not match." : "",
     };
     setWarnings(newWarnings);
@@ -54,8 +57,6 @@ const Signup = ({ onSignup }) => {
     }
 
     try {
-      let exists = await userExists(formData.email,formData.phone,formData.username);
-      if(!exists){
         const userData = await addUser(formData);
   
         setError(null);
@@ -64,12 +65,7 @@ const Signup = ({ onSignup }) => {
   
         // Save user data to local storage
         localStorage.setItem("user", JSON.stringify(userData));
-
-      } else {
-        // Parameter is already in use
-        setError(`${exists?"Email":exists>1?"Phone":"Username"} is already in use. Please use a different one or login using the existing ID.`);
-        return;
-      }
+      
     } catch (error) {
       console.error("Error during Signup:", error);
       // Handle error

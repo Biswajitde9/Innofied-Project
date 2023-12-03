@@ -27,12 +27,12 @@ const UserProfile = ({user,viewer}) => {
         ? <div className="card-header">
             <h2>{`${editedProfile.firstName} ${editedProfile.lastName}`}</h2>
             <p className="text-muted">@{editedProfile.username}</p>
-            <p>Organized <span className="text-info" >{editedProfile.managed.length}</span> events to date. 
-            Participated in <span className="text-info">{editedProfile.attended.length}</span>.</p>
+            <p>Organized <span className="text-info" >{editedProfile.managed?.length}</span> events to date. 
+            Participated in <span className="text-info">{editedProfile.attended?.length}</span>.</p>
           </div> 
         : <div className="card-header">
             <h2>@{editedProfile.username}</h2>
-            <p className="text-muted">Organized {editedProfile.managed.length} events to date. Participated in {editedProfile.attended.length}.</p>
+            <p className="text-muted">Organized {editedProfile.managed?.length} events to date. Participated in {editedProfile.attended.length}.</p>
           </div>
         }
         <div className="card-body">
@@ -70,21 +70,21 @@ const UserProfile = ({user,viewer}) => {
                 <div>
                   <input
                     type="text"
-                    value={editedProfile.social.linkedin}
+                    value={editedProfile.social?.linkedin}
                     onChange={(e) => handleInputChange('social.linkedin', e.target.value)}
                     className="form-control mb-2"
                     placeholder="LinkedIn Profile"
                   />
                   <input
                     type="text"
-                    value={editedProfile.social.x}
+                    value={editedProfile.social?.x}
                     onChange={(e) => handleInputChange('social.x', e.target.value)}
                     className="form-control mb-2"
                     placeholder="Twitter Profile"
                   />
                   <input
                     type="text"
-                    value={editedProfile.social.instagram}
+                    value={editedProfile.social?.instagram}
                     onChange={(e) => handleInputChange('social.instagram', e.target.value)}
                     className="form-control mb-2"
                     placeholder="Instagram Profile"
@@ -93,13 +93,13 @@ const UserProfile = ({user,viewer}) => {
               ) : (
                 <div>
                   <p>
-                    <strong>LinkedIn:</strong> {editedProfile.social.linkedin}
+                    <strong>LinkedIn:</strong> {editedProfile.social?.linkedin}
                   </p>
                   <p>
-                    <strong>Twitter:</strong> {editedProfile.social.twitter}
+                    <strong>Twitter:</strong> {editedProfile.social?.twitter}
                   </p>
                   <p>
-                    <strong>Instagram:</strong> {editedProfile.social.instagram}
+                    <strong>Instagram:</strong> {editedProfile.social?.instagram}
                   </p>
                 </div>
               )}

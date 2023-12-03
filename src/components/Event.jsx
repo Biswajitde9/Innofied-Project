@@ -181,7 +181,8 @@ const Event = ({ currentUser, event, onEdit, onClose, onDelete, isMin = false, i
             </button>
           </div>
           {!showMin &&
-            <Comment
+            <Comment 
+              currentEvent={event}
               data={isPreview ? [{ //dummy data
                   uid: 'anonymousUserId', // Replace with a unique identifier for anonymous users
                   ctime: new Date(), // Replace with the actual creation time

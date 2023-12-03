@@ -93,9 +93,9 @@ const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
         <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary me-3 mb-3">
           Preview Event
         </button>
-        <button type="submit" className="btn btn-secondary mb-3 me-3">
+        {/* <button type="submit" className="btn btn-secondary mb-3 me-3">
           {event == null ? "Create Event" : "Update Event"}
-        </button>
+        </button> */}
         <button className="btn btn-danger mb-3 me-3" onClick={()=>setFormData(resetForm)}>
           Clear
         </button>
@@ -108,6 +108,9 @@ const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
         </div>
       )}
       <form onSubmit={handleSubmit} className="position-relative">
+      <button type="submit" className="btn btn-secondary mb-3 me-3">
+          {event == null ? "Create Event" : "Update Event"}
+        </button>
         <div className="mb-3">
           <label className="form-label">Event Name:</label>
           <input
