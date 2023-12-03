@@ -4,7 +4,7 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete, MdAddComment, MdComment } from "react-icons/md";
 import { addComment, deleteComment, updateComment } from "./Firebase";
 
-const Comment = ({ data, currentEvent, currentUser, isPreview }) => {
+const Comment = ({ data, currentEvent, currentUser, style }) => {
   const [comment, setComment] = useState({});
   const [commentsList, setCommentsList] = useState(data ? data : []);
   const [editIndex, setEditIndex] = useState(null);
@@ -51,7 +51,7 @@ const Comment = ({ data, currentEvent, currentUser, isPreview }) => {
   };
 
   return (
-    <div className="container mt-4 ps-0">
+    <div className="container mt-4 ps-0" style={style}>
       <div className='row'>
         <div className="col-10">
           <input

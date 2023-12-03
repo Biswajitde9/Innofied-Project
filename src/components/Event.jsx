@@ -174,7 +174,6 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
           </div>
           {!showMin &&
             <Comment
-              isPreview={isPreview} 
               data={isPreview ? [{ //dummy data
                   uid: 'anonymousUserId', // Replace with a unique identifier for anonymous users
                   ctime: new Date(), // Replace with the actual creation time
@@ -183,7 +182,7 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
                 }] : comments
               }
               currentUser={currentUser}
-              onClick={(e) => { e.preventDefault() }} 
+              style={isPreview?{pointerEvents:"none"}:{}}
             />}
 
         </div>
