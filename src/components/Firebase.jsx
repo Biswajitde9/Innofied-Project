@@ -162,3 +162,65 @@ export const addEventLike = async (eventId, userId) => {
         console.log('Like added successfully.');
     }
 }
+
+export const addUser = async (formData) => {
+    // Check if user with provided email already exists in the "Users" collection
+    const usersCollection = collection(db, "Users");
+    
+    // Create a new document in the "Users" collection
+    const newUserDocRef = await addDoc(usersCollection, {
+        email: formData.email,
+        username: formData.username,
+        address: formData.address,
+        password: formData.password,
+        phone: formData.phone
+    });
+
+    // Successfully created a new user
+    const userData = {
+        email: formData.email,
+        username: formData.username,
+        uid: newUserDocRef.id, // Assuming the document ID can be used as a user ID
+    };
+    
+    return userData;
+}
+
+export const userExists = async (email, phone, username) => {
+    const usersCollection = collection(db, "Users");
+
+    // Create a query that checks for the existence of a user with any of the provided values
+    const userQuery = query(
+        usersCollection,
+        where("email", "==", email),
+        where("phone", "==", phone),
+        where("username", "==", username)
+    );
+
+    const userQuerySnapshot = await getDocs(userQuery);
+    return userQuerySnapshot.size > 0;
+};
+
+// Function to check if a user with the provided email already exists
+export const emailExists = async (email) => {
+    const usersCollection = collection(db, "Users");
+    const emailQuery = query(usersCollection, where("email", "==", email));
+    const emailQuerySnapshot = await getDocs(emailQuery);
+    return emailQuerySnapshot.size > 0;
+};
+
+// Function to check if a user with the provided phone already exists
+export const phoneExists = async (phone) => {
+    const usersCollection = collection(db, "Users");
+    const phoneQuery = query(usersCollection, where("phone", "==", phone));
+    const phoneQuerySnapshot = await getDocs(phoneQuery);
+    return phoneQuerySnapshot.size > 0;
+};
+
+// Function to check if a user with the provided username already exists
+export const usernameExists = async (username) => {
+    const usersCollection = collection(db, "Users");
+    const usernameQuery = query(usersCollection, where("username", "==", username));
+    const usernameQuerySnapshot = await getDocs(usernameQuery);
+    return usernameQuerySnapshot.size > 0;
+};

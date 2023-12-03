@@ -27,13 +27,12 @@ const UserProfile = ({user,viewer}) => {
         ? <div className="card-header">
             <h2>{`${editedProfile.firstName} ${editedProfile.lastName}`}</h2>
             <p className="text-muted">@{editedProfile.username}</p>
-            <p className="text-info">Organized {editedProfile.managed.length} events to date.</p>
-            <p className="text-info">Participated in {editedProfile.attended.length} events.</p>
+            <p>Organized <span className="text-info" >{editedProfile.managed.length}</span> events to date. 
+            Participated in <span className="text-info">{editedProfile.attended.length}</span>.</p>
           </div> 
         : <div className="card-header">
             <h2>@{editedProfile.username}</h2>
-            <p className="text-muted">Organized {editedProfile.managed.length} events to date.</p>
-            <p className="text-muted">Participated in {editedProfile.attended.length} events.</p>
+            <p className="text-muted">Organized {editedProfile.managed.length} events to date. Participated in {editedProfile.attended.length}.</p>
           </div>
         }
         <div className="card-body">

@@ -23,7 +23,7 @@ const Comment = ({ data, currentEvent, currentUser, style }) => {
         setEditIndex(null);
       } else {
         try{
-          const newComment = { ...comment, eid: currentEvent.id, uid: currentUser.id, uname: currentUser.name};
+          const newComment = { ...comment, eid: currentEvent.id, uid: currentUser.id, uname: currentUser.username};
           await addComment(newComment);
           setCommentsList([...commentsList, newComment]);
         } catch(e){

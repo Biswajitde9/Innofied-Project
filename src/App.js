@@ -62,7 +62,7 @@ const App = () => {
                 <div className="mt-3 mb-3">
                   {isLoggedIn && (
                     <div className="alert alert-success" role="alert">
-                      Welcome, {currentUser.name}!
+                      Welcome, {currentUser.username}!
                     </div>
                   )}
                 </div>
