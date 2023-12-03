@@ -1,23 +1,29 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import ImageInput from "./ImageInput";
 import Event from "./Event";
+import Maps from "./Maps";
 
-const CreateEvent = ({ onCreate, event, currentUser }) => {
+const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
+  const mediaRef = useRef();
+
+  const resetForm = ()=>{
+    return {
+      name: "",
+      desc: "",
+      start_date: "",
+      end_date: "",
+      address: "",
+      location: ["", ""],
+      media_url: [],
+      social: {
+        facebook: "",
+        twitter: "",
+        instagram: "",
+      }};
+  };
+
   const [showPreview, setPreview] = useState(false);
-
-  const [formData, setFormData] = useState(event?event:{
-    name: "",
-    desc: "",
-    start_date: "",
-    end_date: "",
-    address: "",
-    location: ["", ""],
-    media_url: [],
-    social: {
-      facebook: "",
-      twitter: "",
-      instagram: "",
-    },
-  });
+  const [formData, setFormData] = useState(event?event:resetForm());
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +44,16 @@ const CreateEvent = ({ onCreate, event, currentUser }) => {
     }
   };
 
+  const handleMediaUpload = (newImage, id) => {
+    if(formData.media_url[id] != null) {
+      formData.media_url[id] = newImage;
+      setFormData({...formData});
+    } else {
+      formData.media_url.push(newImage);
+      setFormData({...formData});
+    }
+  }
+
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -54,6 +70,14 @@ const CreateEvent = ({ onCreate, event, currentUser }) => {
     });
   };
 
+  const handleMediaDelete = (index) => {
+    if (index >= 0 && index < formData.media_url.length) {
+      setFormData({
+        ...[...formData.media_url.slice(0, index), ...formData.media_url.slice(index + 1)],
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     onCreate({
@@ -63,17 +87,16 @@ const CreateEvent = ({ onCreate, event, currentUser }) => {
 
   return (
     <div className="container mt-5">
-      <div className="row">
-        <div className="mb-3">
-          <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary">
-            Preview Event
-          </button>
-        </div>
-        <div className="mb-3">
-          <button type="submit" className="btn btn-primary">
-            {event != null ? "Create Event" : "Update Event"}
-          </button>
-        </div>
+      <div className="d-flex flex-wrap justify-content-end">
+        <button onClick={() => { setPreview(!showPreview) }} className="btn btn-primary me-3 mb-3">
+          Preview Event
+        </button>
+        <button type="submit" className="btn btn-secondary mb-3 me-3">
+          {event == null ? "Create Event" : "Update Event"}
+        </button>
+        <button className="btn btn-danger mb-3 me-3" onClick={()=>setFormData(resetForm)}>
+          Clear
+        </button>
       </div>
 
       {showPreview && (
@@ -139,24 +162,31 @@ const CreateEvent = ({ onCreate, event, currentUser }) => {
         </div>
         <div className="mb-3">
           <label className="form-label">Location:</label>
-          <input
-            type="text"
-            name="location"
-            value={formData.location.join(", ")}
-            onChange={handleLocationChange}
-            className="form-control"
-            required
-          />
+          <Maps name="location" latitude={formData.location[0]} longtude={formData.location[1]} className="form-control" isEdit={true} onClick={handleLocationChange}/>
         </div>
         <div className="mb-3">
-          <label className="form-label">Media URLs (comma-separated):</label>
+          <label className="form-label">Media</label>
           <input
+            ref={mediaRef}
             type="text"
             name="media_url"
             value={formData.media_url.join(", ")}
             onChange={handleMediaChange}
             className="form-control"
+            style={{display:"none"}}
           />
+          <div className="row flex-wrap mx-2" style={{height: "100px"}}>
+          {
+            //giving 1 extra null item for adding new image apart from existing ones
+            [...formData.media_url,null].map((image, imgIndex) => (
+              <ImageInput 
+                key={imgIndex} 
+                onChange={()=>handleMediaUpload(image, imgIndex)} 
+                onDelete={()=>handleMediaDelete(imgIndex)}
+                initialImage={image} />
+            ))
+          }
+          </div>
         </div>
         <div className="mb-3">
           <label className="form-label">Social Handles:</label>
