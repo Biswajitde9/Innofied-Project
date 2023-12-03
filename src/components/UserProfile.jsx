@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserprofileData from "./userProfileData.json"
-const UserProfile = () => {
-    const profileData = UserprofileData.profile
+
+const UserProfile = ({user,viewer}) => {
   const [editMode, setEditMode] = useState(false);
-  const [editedProfile, setEditedProfile] = useState({ ...profileData });
+  const [editedProfile, setEditedProfile] = useState({ ...user });
 
   const handleEditSave = () => {
     // Perform save operation here (e.g., send updates to the server)
@@ -24,10 +23,19 @@ const UserProfile = () => {
   return (
     <div className="container mt-4">
       <div className="card">
-        <div className="card-header">
-          <h2>{`${editedProfile.firstName} ${editedProfile.lastName}`}</h2>
-          <p className="text-muted">@{editedProfile.username}</p>
-        </div>
+        {user == viewer 
+        ? <div className="card-header">
+            <h2>{`${editedProfile.firstName} ${editedProfile.lastName}`}</h2>
+            <p className="text-muted">@{editedProfile.username}</p>
+            <p className="text-info">Organized {editedProfile.managed.length} events to date.</p>
+            <p className="text-info">Participated in {editedProfile.attended.length} events.</p>
+          </div> 
+        : <div className="card-header">
+            <h2>@{editedProfile.username}</h2>
+            <p className="text-muted">Organized {editedProfile.managed.length} events to date.</p>
+            <p className="text-muted">Participated in {editedProfile.attended.length} events.</p>
+          </div>
+        }
         <div className="card-body">
           <dl className="row">
             <dt className="col-sm-3">Email:</dt>
@@ -37,16 +45,14 @@ const UserProfile = () => {
             <dd className="col-sm-9">{editedProfile.phone}</dd>
 
             <dt className="col-sm-3">Address:</dt>
-            <dd className="col-sm-9">
-              {`${editedProfile.address.street}, ${editedProfile.address.city}, ${editedProfile.address.state} ${editedProfile.address.zipCode}`}
-            </dd>
+            <dd className="col-sm-9">{editedProfile.address}</dd>
 
-            <dt className="col-sm-3">Company:</dt>
-            <dd className="col-sm-9">{editedProfile.companyName}</dd>
+            <dt className="col-sm-3">Organizations:</dt>
+            <dd className="col-sm-9">{editedProfile.org}</dd>
 
             <dt className="col-sm-3">Bio:</dt>
             <dd className="col-sm-9">
-              {editMode ? (
+              {(user == viewer && editMode) ? (
                 <div className="mb-2">
                   <textarea
                     value={editedProfile.bio}
@@ -61,26 +67,26 @@ const UserProfile = () => {
 
             <dt className="col-sm-3">Social Media:</dt>
             <dd className="col-sm-9">
-              {editMode ? (
+              {(user == viewer && editMode) ? (
                 <div>
                   <input
                     type="text"
-                    value={editedProfile.socialMedia.linkedin}
-                    onChange={(e) => handleInputChange('socialMedia.linkedin', e.target.value)}
+                    value={editedProfile.social.linkedin}
+                    onChange={(e) => handleInputChange('social.linkedin', e.target.value)}
                     className="form-control mb-2"
                     placeholder="LinkedIn Profile"
                   />
                   <input
                     type="text"
-                    value={editedProfile.socialMedia.twitter}
-                    onChange={(e) => handleInputChange('socialMedia.twitter', e.target.value)}
+                    value={editedProfile.social.x}
+                    onChange={(e) => handleInputChange('social.x', e.target.value)}
                     className="form-control mb-2"
                     placeholder="Twitter Profile"
                   />
                   <input
                     type="text"
-                    value={editedProfile.socialMedia.instagram}
-                    onChange={(e) => handleInputChange('socialMedia.instagram', e.target.value)}
+                    value={editedProfile.social.instagram}
+                    onChange={(e) => handleInputChange('social.instagram', e.target.value)}
                     className="form-control mb-2"
                     placeholder="Instagram Profile"
                   />
@@ -88,13 +94,13 @@ const UserProfile = () => {
               ) : (
                 <div>
                   <p>
-                    <strong>LinkedIn:</strong> {editedProfile.socialMedia.linkedin}
+                    <strong>LinkedIn:</strong> {editedProfile.social.linkedin}
                   </p>
                   <p>
-                    <strong>Twitter:</strong> {editedProfile.socialMedia.twitter}
+                    <strong>Twitter:</strong> {editedProfile.social.twitter}
                   </p>
                   <p>
-                    <strong>Instagram:</strong> {editedProfile.socialMedia.instagram}
+                    <strong>Instagram:</strong> {editedProfile.social.instagram}
                   </p>
                 </div>
               )}
@@ -102,12 +108,14 @@ const UserProfile = () => {
           </dl>
         </div>
       </div>
-
-      <div className="mt-4">
-        <button className={`btn ${editMode ? 'btn-success' : 'btn-primary'}`} onClick={editMode ? handleEditSave : () => setEditMode(true)}>
-          {editMode ? 'Save' : 'Edit'}
-        </button>
-      </div>
+      
+      {(user == viewer) &&
+        <div className="mt-4">
+          <button className={`btn ${editMode ? 'btn-success' : 'btn-primary'}`} onClick={editMode ? handleEditSave : () => setEditMode(true)}>
+            {editMode ? 'Save' : 'Edit'}
+          </button>
+        </div>
+      }
     </div>
   );
 };

@@ -33,7 +33,7 @@ const Event = ({ currentUser, event, onEdit, onClose, onDelete, isMin = false, i
   });
 
   const [likes, setLikes] = useState(cache.rating ? cache.rating.length : 0);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(cache.rating ? cache.rating.includes(currentUser.id) : false);
 
   const handleLikeClick = () => {
     if (isLiked) {
@@ -176,7 +176,7 @@ const Event = ({ currentUser, event, onEdit, onClose, onDelete, isMin = false, i
             <button
               className={`p-0 like-btn btn ${isLiked ? 'btn-danger' : 'btn-primary'}`}
               onClick={handleLikeClick}
-              disabled={!isPreview}>
+              disabled={isPreview}>
               <FaHeart /> {likes > 0 && `(${likes})`} {isLiked ? 'Liked!' : 'Like'}
             </button>
           </div>

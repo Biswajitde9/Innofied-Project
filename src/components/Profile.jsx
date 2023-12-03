@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Calendar from './Calendar';
 import CreateEvent from './CreateEvent';
+import UserProfile from './UserProfile';
 import Alert from './Alert';
 
 import EventsList from './EventsList';
@@ -161,6 +162,9 @@ const Profile = ({ currentUser }) => {
         )}
         {activeTab === 'create' && (
           <CreateEvent currentUser={currentUser} event={currentEvent} onCreate={handleEventUpdate} />
+        )}
+        {activeTab === 'profile' && (
+          <UserProfile user={currentUser} viewer={currentUser} />
         )}
       </div>
       {alert}

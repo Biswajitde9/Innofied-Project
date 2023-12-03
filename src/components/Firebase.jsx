@@ -9,6 +9,7 @@ import {
     query,
     doc,
     addDoc,
+    getDoc,
     updateDoc,
     deleteDoc,
     documentId,
@@ -126,7 +127,7 @@ export const deleteMediaByIndex = async (eventId, mediaId) => {
     const eventRef = doc(db, 'Events', eventId);
 
     // Retrieve the current document data
-    const eventSnapshot = await eventRef.get();
+    const eventSnapshot = await getDoc(eventRef);
     const eventData = eventSnapshot.data();
 
     // Check if the index is within the valid range
@@ -141,8 +142,8 @@ export const deleteMediaByIndex = async (eventId, mediaId) => {
 export const addEventLike = async (eventId, userId) => {
     const eventRef = doc(db, 'Events', eventId);
 
-    // Check if the user ID already exists in the "rating" array
-    const eventSnapshot = await eventRef.get();
+    // Retrieve the current document data
+    const eventSnapshot = await getDoc(eventRef);
     const eventData = eventSnapshot.data();
 
     if (eventData.rating && eventData.rating.includes(userId)) {
