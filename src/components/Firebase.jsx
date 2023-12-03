@@ -118,7 +118,7 @@ export const deleteComment = async (commentId, eventId) => {
     // Remove the specified comment from the "comments" array in the event document
     const eventDocRef = doc(db, "Events", eventId);
     await updateDoc(eventDocRef, {
-      comments: arrayRemove({ id: commentId }),
+        comments: arrayRemove({ id: commentId }),
     });
 };
 
@@ -128,12 +128,36 @@ export const deleteMediaByIndex = async (eventId, mediaId) => {
     // Retrieve the current document data
     const eventSnapshot = await eventRef.get();
     const eventData = eventSnapshot.data();
-  
+
     // Check if the index is within the valid range
     if (mediaId >= 0 && mediaId < eventData.media_urls.length) {
         // Use arrayRemove to remove the element at the specified index
         await updateDoc(eventRef, {
             media_urls: arrayRemove(eventData.media_urls[mediaId]),
         })
+    }
+}
+
+export const addEventLike = async (eventId, userId) => {
+    const eventRef = doc(db, 'Events', eventId);
+
+    // Check if the user ID already exists in the "rating" array
+    const eventSnapshot = await eventRef.get();
+    const eventData = eventSnapshot.data();
+
+    if (eventData.rating && eventData.rating.includes(userId)) {
+        // User already liked, so remove the like
+        await updateDoc(eventRef, {
+            rating: arrayRemove(userId),
+        });
+
+        console.log('Like removed successfully.');
+    } else {
+        // User hasn't liked yet, so add the like
+        await updateDoc(eventRef, {
+            rating: arrayUnion(userId),
+        });
+
+        console.log('Like added successfully.');
     }
 }

@@ -44,16 +44,6 @@ const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
     }
   };
 
-  const handleMediaUpload = (newImage, id) => {
-    if(formData.media_url[id] != null) {
-      formData.media_url[id] = newImage;
-      setFormData({...formData});
-    } else {
-      formData.media_url.push(newImage);
-      setFormData({...formData});
-    }
-  }
-
   const handleLocationChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -62,28 +52,40 @@ const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
     });
   };
 
-  const handleMediaChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value.split(",").map((url) => url.trim()),
-    });
+  const handleMediaChange = (value, id) => {
+    if (id >= 0 && id < formData.media_url.length) {
+      formData.media_url[id] = value;
+      setFormData({...formData});
+    } else {
+      formData.media_url.push(value);
+      setFormData({...formData});
+    }
   };
 
-  const handleMediaDelete = (index) => {
-    if (index >= 0 && index < formData.media_url.length) {
-      setFormData({
-        ...[...formData.media_url.slice(0, index), ...formData.media_url.slice(index + 1)],
-      });
+  const handleMediaDelete = (id) => {
+    if (id >= 0 && id < formData.media_url.length) {
+      formData.media_url = [...formData.media_url.slice(0, id), ...formData.media_url.slice(id + 1)];
+      setFormData({...formData});
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    onCreate({
-      ...formData
-    });
+    onCreate({...formData});
   };
+
+  //giving 1 extra null item for adding new image apart from existing ones
+  const imageInputs = [...formData.media_url,null].map((image, imgIndex) => (
+    <ImageInput 
+      key={imgIndex} 
+      onChange={()=>{
+        handleMediaChange(image, imgIndex)
+      }} 
+      onDelete={()=>{
+        handleMediaDelete(imgIndex)
+      }}
+      initialImage={image} />
+  ))
 
   return (
     <div className="container mt-5">
@@ -175,18 +177,7 @@ const CreateEvent = ({ onCreate, event, onCache, currentUser }) => {
             className="form-control"
             style={{display:"none"}}
           />
-          <div className="row flex-wrap mx-2" style={{height: "100px"}}>
-          {
-            //giving 1 extra null item for adding new image apart from existing ones
-            [...formData.media_url,null].map((image, imgIndex) => (
-              <ImageInput 
-                key={imgIndex} 
-                onChange={()=>handleMediaUpload(image, imgIndex)} 
-                onDelete={()=>handleMediaDelete(imgIndex)}
-                initialImage={image} />
-            ))
-          }
-          </div>
+          <div className="row flex-wrap mx-2" style={{height: "100px"}}>{imageInputs}</div>
         </div>
         <div className="mb-3">
           <label className="form-label">Social Handles:</label>

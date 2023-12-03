@@ -4,6 +4,7 @@ import { FaMapMarked, FaHeart } from 'react-icons/fa';
 import Maps from './Maps';
 import Comment from "./Comment";
 import { MdDelete } from "react-icons/md";
+import { addEventLike } from "./Firebase";
 
 export const StatusTextArray = ['PLANNED', 'DELAYED', 'STARTED', 'ENDED', 'CANCELLED'];
 export const StatusBgColors = [
@@ -14,24 +15,24 @@ export const StatusBgColors = [
   '#F44336'    // Red
 ];
 
-const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = false, isPreview = false, style = {} }) => {
+const Event = ({ currentUser, event, onEdit, onClose, onDelete, isMin = false, isPreview = false, style = {} }) => {
   const selfRef = useRef();
-  const {
-    name,
-    desc,
-    start_date,
-    end_date,
-    address,
-    location,
-    media_url,
-    attendees,
-    rating,
-    social,
-    status,
-    comments
-  } = event;
+  const [cache,setCache] = useState(event?event:{
+    name:"",
+    desc:"",
+    start_date:null,
+    end_date:null,
+    address:"",
+    location:"",
+    media_url:[],
+    attendees:[],
+    rating:null,
+    social:{},
+    status:"",
+    comments:[]
+  });
 
-  const [likes, setLikes] = useState(event.rating ? event.rating : 0);
+  const [likes, setLikes] = useState(cache.rating ? cache.rating.length : 0);
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLikeClick = () => {
@@ -40,25 +41,25 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
     } else {
       setLikes((prevLikes) => prevLikes + 1);
     }
-
+    
     // Toggle the isLiked state
     setIsLiked((prevIsLiked) => !prevIsLiked);
-    onLike();
+    addEventLike(cache.id,currentUser.id);
   };
 
   const [showMin, setMin] = useState(isMin);
   const [showLocation, setLocation] = useState(false);
 
-  const statusText = StatusTextArray[status] || 'UNKNOWN';
+  const statusText = StatusTextArray[cache.status] || 'UNKNOWN';
 
-  let stars = []
-  for (var i = 0; i + 1 <= Math.floor(rating); i++) {
-    stars.push(<FaStar key={i} className='mb-1' style={{ height: 20, width: 20, color: "gold" }}></FaStar>)
-  }
-  if (rating - Math.floor(rating) > 0.3) stars.push(<FaStarHalf style={{ color: "yellow" }} />)
-  for (var i = 0; i + 1 <= (5 - Math.floor(rating)); i++) {
-    stars.push(<FaStar key={5 + i} className='mb-1' style={{ height: 20, width: 20, color: "#aaa" }}></FaStar>)
-  }
+  // let stars = []
+  // for (var i = 0; i + 1 <= Math.floor(rating); i++) {
+  //   stars.push(<FaStar key={i} className='mb-1' style={{ height: 20, width: 20, color: "gold" }}></FaStar>)
+  // }
+  // if (rating - Math.floor(rating) > 0.3) stars.push(<FaStarHalf style={{ color: "yellow" }} />)
+  // for (var i = 0; i + 1 <= (5 - Math.floor(rating)); i++) {
+  //   stars.push(<FaStar key={5 + i} className='mb-1' style={{ height: 20, width: 20, color: "#aaa" }}></FaStar>)
+  // }
 
 
   // const handleDelete = async () => {
@@ -76,16 +77,16 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
   // };
 
   return (
-    <div id={event.id} ref={selfRef} className={`container my-3 overflow-hidden ${showMin ? "min" : "max"}`} style={style}>
+    <div id={cache.id} ref={selfRef} className={`container my-3 overflow-hidden ${showMin ? "min" : "max"}`} style={style}>
       {showLocation && 
         <div className='floating-preview'>
-          <Maps latitude={location[0]} longitude={location[1]} onClose={() => setLocation(false)} />
+          <Maps latitude={cache.location[0]} longitude={cache.location[1]} onClose={() => setLocation(false)} />
         </div>
       }
 
       <div
         className={`row ${showMin ? "w-100 justify-content-between" : "py-2 justify-content-start"}`}
-        style={{ borderRadius: 8, background: `${StatusBgColors[status]}22`, border: `solid 2px ${StatusBgColors[status]}` }}
+        style={{ borderRadius: 8, background: `${StatusBgColors[cache.status]}22`, border: `solid 2px ${StatusBgColors[cache.status]}` }}
       >
 
         {!showMin &&
@@ -115,7 +116,7 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
 
         <div className={`event-image d-flex align-items-top mt-5 ${showMin ? "col-1" : "col-12 col-md-4"}`} >
           <ul className="list-unstyled">
-            {media_url.map((url, index) => (
+            {cache.media_url.map((url, index) => (
               <li key={index}>
                 <img src={url} 
                   style={{ borderRadius: 8, maxHeight: "100%", maxWidth: "100%", objectFit: "cover" }} 
@@ -127,50 +128,55 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
         </div>
 
         <div className={`event-details ${showMin ? "col-9 ms-0 me-0 justify-content-between" : "col-12 col-md-8"}`} style={{ minHeight: 340, lineHeight: 2 }}>
-          <h1 className={`align-items-center ${showMin ? "text-truncate" : ""}`} >{name}
+          <h1 className={`align-items-center ${showMin ? "text-truncate" : ""}`} >{cache.name}
             {/* {!showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
           </h1>
 
           {!showMin && <>
             <div className='event-people mt-2 d-flex flex-flow-column align-items-center'>
               <FaUser className="icon" style={{ color: "green" }} />
-              <span style={{ weight: "500", paddingRight: "6px" }}>{attendees}</span> people attending.
+              <span style={{ weight: "500", paddingRight: "6px" }}>{cache.attendees}</span> people attending.
             </div>
             <div className='event-loc mt-2 d-flex flex-flow-column align-items-center'>
               <FaMapMarkerAlt className="icon" style={{ color: "orange" }} onClick={() => setLocation(true)} />
-              <b style={{ paddingRight: "6px" }}>Venue:</b> {address}.
+              <b style={{ paddingRight: "6px" }}>Venue:</b> {cache.address}.
             </div>
             <div className='event-date event mt-2 d-flex flex-flow-column align-items-center'>
-              <FaCalendarCheck className="icon" style={{ color: "skyblue" }} /> <b style={{ paddingRight: "6px" }}>{new Date(start_date).toLocaleDateString()} - {new Date(end_date).toLocaleDateString()}</b>
+              <FaCalendarCheck className="icon" style={{ color: "skyblue" }} /> 
+              <b style={{ paddingRight: "6px" }}>{new Date(cache.start_date).toLocaleDateString()} - {new Date(cache.end_date).toLocaleDateString()}</b>
             </div>
-            <p style={{ lineHeight: "1.5" }} className='event-desc mt-2'>{desc}</p>
+            <p style={{ lineHeight: "1.5" }} className='event-desc mt-2'>{cache.desc}</p>
           </>}
 
-          {statusText && <h6 className='align-items-center justify-content-center flex-wrap flex-sm-nowrap me-2' style={{ width: "fit-content", color: StatusBgColors[status] }}>
-            {/* {showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
-            {statusText}</h6>}
+          {statusText && 
+            <h6 className='align-items-center justify-content-center flex-wrap flex-sm-nowrap me-2' 
+              style={{ width: "fit-content", color: StatusBgColors[cache.status] }}>
+              {/* {showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
+              {statusText}
+            </h6>
+          }
           {!showMin && <h3 className='mt-2'>Follow the event:</h3>}
           <div className={`event-social`}>
             {/* Assuming keys are "facebook", "instagram", and "twitter" */}
-            {social.facebook &&
-              <a href={social.facebook} role='button'>
+            {cache.social.facebook &&
+              <a href={cache.social.facebook} role='button'>
                 <FaFacebookSquare style={{ background: "white", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
-            {social.twitter &&
-              <a href={social.twitter} role='button'>
+            {cache.social.twitter &&
+              <a href={cache.social.twitter} role='button'>
                 <FaTwitterSquare style={{ background: "white", color: "black", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
-            {social.instagram &&
-              <a href={social.instagram} role='button'>
+            {cache.social.instagram &&
+              <a href={cache.social.instagram} role='button'>
                 <FaInstagramSquare style={{ background: "white", color: "red", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
             <button
               className={`p-0 like-btn btn ${isLiked ? 'btn-danger' : 'btn-primary'}`}
               onClick={handleLikeClick}
-              disabled={onLike == null || !isPreview}>
+              disabled={!isPreview}>
               <FaHeart /> {likes > 0 && `(${likes})`} {isLiked ? 'Liked!' : 'Like'}
             </button>
           </div>
@@ -181,7 +187,7 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
                   ctime: new Date(), // Replace with the actual creation time
                   message: 'I am coming!',
                   username: 'Anonymous', // You can customize the username for anonymous users
-                }] : comments
+                }] : cache.comments
               }
               currentUser={currentUser}
               style={isPreview?{pointerEvents:"none"}:{}}
@@ -214,7 +220,8 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
                 </button>
               }
               {onEdit &&
-                <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" ><FaPen color='white' />
+                <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" >
+                  <FaPen color='white' />
                 </button>
               }
             </div>

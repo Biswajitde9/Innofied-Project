@@ -15,7 +15,8 @@ const EventsList = ({events,currentUser,handleEdit,handleDelete,setAlert}) => {
                 onDelete={()=>{
                     //get event details
                     let message = "";
-                    switch(StatusTextArray[event.status]){
+                    let manages = currentUser.managed.includes(event.id);
+                    if (manages) {switch(StatusTextArray[event.status]) {
                     case 'PLANNED': 
                         message = <>
                         Are you sure you wish to delete the planned event <span className="text-danger">{event.name}</span>?
@@ -40,6 +41,15 @@ const EventsList = ({events,currentUser,handleEdit,handleDelete,setAlert}) => {
                         If you are trying to restart the event you can cancel now choose that option instead. All participants will be notified.
                         </>
                         break;
+                    }} else {
+                        switch(StatusTextArray[event.status]) {
+                            case 'CANCELLED': case 'ENDED':
+                                message = <>This event has ended. Delete it from your history?</>; 
+                                break;
+                            default: 
+                                message = <>Do you wish to cancel your trip to <span className="text-danger">{event.name}</span>?</>; 
+                                break;
+                        }        
                     }
 
                     //make alert box
