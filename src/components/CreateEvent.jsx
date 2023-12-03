@@ -1,25 +1,16 @@
-import React, { useState } from "react";
-import { db } from "../firebase-init";
-import {
-  collection,
-  addDoc,
-  updateDoc,
-  doc,
-  serverTimestamp,
-  arrayUnion,
-} from "firebase/firestore";
+import { useState } from "react";
 import Event from "./Event";
 
-const CreateEvent = ({ user, onCreate, isEdit }) => {
+const CreateEvent = ({ onCreate, event, currentUser }) => {
   const [showPreview, setPreview] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(event?event:{
     name: "",
     desc: "",
     start_date: "",
     end_date: "",
     address: "",
-    location: [0, 0], // Assuming initial location
+    location: ["", ""],
     media_url: [],
     social: {
       facebook: "",
@@ -65,31 +56,11 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      // Add a new document to the "Events" collection
-      const eventsCollection = collection(db, "Events");
-      const newEventRef = await addDoc(eventsCollection, {
-        ...formData,
-        uid: user.uid,
-        status: 0,
-        created_at: serverTimestamp(),
-      });
-
-      // Update the "managed" array of the user with the new event ID
-      const userDocRef = doc(db, "Users", user.uid);
-      await updateDoc(userDocRef, {
-        managed: arrayUnion(newEventRef.id),
-      });
-
-      // Navigate to the home page
-      onCreate(newEventRef.id);
-      //navigate("/");
-    } catch (error) {
-      console.error("Error creating event:", error);
-      // Handle error
-    }
+    onCreate({
+      ...formData
+    });
   };
+
   return (
     <div className="container mt-5">
       <div className="row">
@@ -100,15 +71,15 @@ const CreateEvent = ({ user, onCreate, isEdit }) => {
         </div>
         <div className="mb-3">
           <button type="submit" className="btn btn-primary">
-            Create Event
+            {event != null ? "Create Event" : "Update Event"}
           </button>
         </div>
       </div>
 
       {showPreview && (
-        <div className="floating-preview bg-light p-4 rounded mt-3">
+        <div className="floating-preview bg-light p-4 rounded mt-3" style={{flexDirection:"column"}}>
           <h3>Preview:</h3>
-          <Event event={formData} isMin={false} onClose={() => setPreview(false)} />
+          <Event currentUser={currentUser} event={formData} isMin={false} isPreview={true} onClose={() => setPreview(false)} />
         </div>
       )}
       <form onSubmit={handleSubmit} className="position-relative">

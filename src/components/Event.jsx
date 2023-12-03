@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FaFacebookSquare, FaMapPin, FaTwitterSquare, FaInstagramSquare, FaPeopleArrows, FaUserFriends, FaUserCircle, FaUsersCog, FaUser, FaUserAlt, FaLocationArrow, FaMapMarker, FaMapMarkerAlt, FaStar, FaStarHalfAlt, FaStarHalf, FaCalendarWeek, FaCalendarCheck, FaCalendar, FaCalendarDay, FaCalendarAlt, FaCalendarTimes, FaDumpster, FaRecycle, FaEraser, FaCalendarMinus, FaWindowClose, FaRegWindowClose, FaCross, FaWindowMinimize, FaCaretSquareUp, FaAngleDoubleUp, FaPencilAlt, FaEdit, FaRegEdit, FaUserEdit, FaPen, FaAngleDoubleDown } from 'react-icons/fa';
 import { FaMapMarked, FaHeart } from 'react-icons/fa';
 import { db } from '../firebase-init';
@@ -16,8 +16,8 @@ export const StatusBgColors = [
   '#F44336'    // Red
 ];
 
-const Event = ({ event, isMin, onLike, onEdit, onClose, onDelete }) => {
-  console.log(event);
+const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = false, isPreview = false, style = {} }) => {
+  const selfRef = useRef();
   const {
     name,
     desc,
@@ -30,9 +30,10 @@ const Event = ({ event, isMin, onLike, onEdit, onClose, onDelete }) => {
     rating,
     social,
     status,
+    comments
   } = event;
 
-  const [likes, setLikes] = useState(0);
+  const [likes, setLikes] = useState(event.rating ? event.rating : 0);
   const [isLiked, setIsLiked] = useState(false);
 
   const handleLikeClick = () => {
@@ -49,7 +50,7 @@ const Event = ({ event, isMin, onLike, onEdit, onClose, onDelete }) => {
 
   const [showMin, setMin] = useState(isMin);
   const [showLocation, setLocation] = useState(false);
-  
+
   const statusText = StatusTextArray[status] || 'UNKNOWN';
 
   let stars = []
@@ -77,52 +78,55 @@ const Event = ({ event, isMin, onLike, onEdit, onClose, onDelete }) => {
   // };
 
   return (
-    <div className={`container my-3 overflow-hidden ${showMin?"min":"max"}`}>
+    <div id={event.id} ref={selfRef} className={`container my-3 overflow-hidden ${showMin ? "min" : "max"}`} style={style}>
       {showLocation && <Maps latitude={location[0]} longitude={location[1]} onClose={() => setLocation(false)} />}
-      
-      <div 
-        className={`row ${showMin ? "w-100 justify-content-between" : "py-2 justify-content-start"}`} 
-        style={{ borderRadius: 8, background: `${StatusBgColors[status]}22`, border: `solid 2px ${StatusBgColors[status]}` }}
-        >
-      
-      {!showMin && 
-        <div className="button-row-ctr d-flex justify-content-end" >
-          <div className="button-row mb-5 d-flex align-items-top position-absolute" style={{transform:"rotateZ(180)", marginTop:"-8px"}}>
-            {onEdit &&
-              <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" ><FaPen color='white' />
-              </button>
-            }
-            {onDelete && 
-              <button onClick={onDelete} className="me-2 btn btn-danger event-ctrl">
-                <MdDelete />
-              </button>
-            }
-            {onClose 
-            ? <button onClick={onClose} className="btn btn-primary me-2 event-ctrl">
-                <FaWindowClose />
-              </button>
-            : <button onClick={()=>setMin(!showMin)} className="btn btn-primary me-2 event-ctrl">
-                <FaAngleDoubleDown style={{rotate:"180deg"}}/>
-              </button>
-            }
-          </div>
-        </div>
-      }
-      
 
-        <div className={`event-image d-flex align-items-sm-center ${showMin?"col-1":"col-12 col-md-4"}`} >
+      <div
+        className={`row ${showMin ? "w-100 justify-content-between" : "py-2 justify-content-start"}`}
+        style={{ borderRadius: 8, background: `${StatusBgColors[status]}22`, border: `solid 2px ${StatusBgColors[status]}` }}
+      >
+
+        {!showMin &&
+          <div className="button-row-ctr d-flex justify-content-end" >
+            <div className="button-row mb-5 d-flex align-items-top position-absolute" style={{ transform: "rotateZ(180)", marginTop: "-8px" }}>
+              {onClose
+                ? <button onClick={onClose} className="btn btn-primary me-2 event-ctrl">
+                  <FaWindowClose />
+                </button>
+                : <button onClick={() => setMin(true)} className="btn btn-primary me-2 event-ctrl">
+                  <FaAngleDoubleDown style={{ rotate: "180deg" }} />
+                </button>
+              }
+              {onDelete &&
+                <button onClick={onDelete} className="me-2 btn btn-danger event-ctrl">
+                  <MdDelete />
+                </button>
+              }
+              {onEdit &&
+                <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" ><FaPen color='white' />
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+
+        <div className={`event-image d-flex align-items-top mt-5 ${showMin ? "col-1" : "col-12 col-md-4"}`} >
           <ul className="list-unstyled">
             {media_url.map((url, index) => (
               <li key={index}>
-                <img src={url} style={{ borderRadius: 8, maxHeight: "100%", maxWidth: "100%", objectFit: "cover" }} alt={`Media ${index + 1}`} className="img-fluid" />
+                <img src={url} 
+                  style={{ borderRadius: 8, maxHeight: "100%", maxWidth: "100%", objectFit: "cover" }} 
+                  alt={`Media ${index + 1}`} 
+                  className="img-fluid" />
               </li>
             ))}
           </ul>
         </div>
 
         <div className={`event-details ${showMin ? "col-9 ms-0 me-0 justify-content-between" : "col-12 col-md-8"}`} style={{ minHeight: 340, lineHeight: 2 }}>
-          <h1 className={`align-items-center ${showMin ? "text-truncate" : ""}`} >{name} 
-          {/* {!showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
+          <h1 className={`align-items-center ${showMin ? "text-truncate" : ""}`} >{name}
+            {/* {!showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
           </h1>
 
           {!showMin && <>
@@ -140,57 +144,80 @@ const Event = ({ event, isMin, onLike, onEdit, onClose, onDelete }) => {
             <p style={{ lineHeight: "1.5" }} className='event-desc mt-2'>{desc}</p>
           </>}
 
-          {statusText && <h6 className='align-items-center justify-content-center flex-wrap flex-sm-nowrap me-2' style={{width:"fit-content",color:StatusBgColors[status]}}>
+          {statusText && <h6 className='align-items-center justify-content-center flex-wrap flex-sm-nowrap me-2' style={{ width: "fit-content", color: StatusBgColors[status] }}>
             {/* {showMin && <span style={{ textWrap: "nowrap" }}>{stars}</span>} */}
             {statusText}</h6>}
           {!showMin && <h3 className='mt-2'>Follow the event:</h3>}
           <div className={`event-social`}>
             {/* Assuming keys are "facebook", "instagram", and "twitter" */}
-            {social.facebook && 
+            {social.facebook &&
               <a href={social.facebook} role='button'>
                 <FaFacebookSquare style={{ background: "white", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
-            {social.twitter && 
+            {social.twitter &&
               <a href={social.twitter} role='button'>
                 <FaTwitterSquare style={{ background: "white", color: "black", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
-            {social.instagram && 
+            {social.instagram &&
               <a href={social.instagram} role='button'>
                 <FaInstagramSquare style={{ background: "white", color: "red", height: 40, width: 40, borderRadius: 5 }} className="me-2" />
               </a>
             }
-            <button className={`p-0 like-btn btn ${isLiked ? 'btn-danger' : 'btn-primary'}`} onClick={handleLikeClick} disabled={onLike==null}>
+            <button
+              className={`p-0 like-btn btn ${isLiked ? 'btn-danger' : 'btn-primary'}`}
+              onClick={handleLikeClick}
+              disabled={onLike == null || !isPreview}>
               <FaHeart /> {likes > 0 && `(${likes})`} {isLiked ? 'Liked!' : 'Like'}
             </button>
           </div>
-          {!showMin && <Comment data={event.comments} />}
-          
+          {!showMin &&
+            <Comment
+              isPreview={isPreview} 
+              data={isPreview ? [{ //dummy data
+                  uid: 'anonymousUserId', // Replace with a unique identifier for anonymous users
+                  ctime: new Date(), // Replace with the actual creation time
+                  message: 'I am coming!',
+                  username: 'Anonymous', // You can customize the username for anonymous users
+                }] : comments
+              }
+              currentUser={currentUser}
+              onClick={(e) => { e.preventDefault() }} 
+            />}
+
         </div>
-        
+
         {showMin &&
-        <div className={`button-row-ctr ${showMin?"col-2":"d-flex justify-content-end"}`}>
-          <div className={`button-row mb-5 position-absolute`}>
-            {onEdit &&
-              <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" ><FaPen color='white' />
-              </button>
-            }
-            {onDelete && 
-              <button onClick={onDelete} className="me-2 btn btn-danger event-ctrl">
-                <MdDelete />
-              </button>
-            }
-            {onClose 
-            ? <button onClick={onClose} className="btn btn-primary me-2 event-ctrl">
-                <FaWindowClose />
-              </button>
-            : <button onClick={()=>setMin(!showMin)} className="btn btn-primary me-2 event-ctrl">
-                <FaAngleDoubleDown style={{rotate:showMin ? "0deg" : "180deg"}}/>
-              </button>
-            }
+          <div className={`button-row-ctr ${showMin ? "col-2" : "d-flex justify-content-end"}`}>
+            <div className={`button-row mb-5 position-absolute`}>
+              {onClose
+                ? <button onClick={onClose} className="btn btn-primary me-2 event-ctrl">
+                  <FaWindowClose />
+                </button>
+                : <button
+                  onClick={() => {
+                    setMin(!showMin);
+                    setTimeout(() => {
+                      selfRef.current.scrollIntoViewIfNeeded({ behavior: 'smooth' })
+                    }, 300);
+                  }}
+                  className="btn btn-primary me-2 event-ctrl"
+                >
+                  <FaAngleDoubleDown style={{ rotate: showMin ? "0deg" : "180deg" }} />
+                </button>
+              }
+              {onDelete &&
+                <button onClick={onDelete} className="me-2 btn btn-danger event-ctrl">
+                  <MdDelete />
+                </button>
+              }
+              {onEdit &&
+                <button onClick={onEdit} className="btn btn-warning me-2 event-ctrl" ><FaPen color='white' />
+                </button>
+              }
+            </div>
           </div>
-        </div>
         }
       </div>
     </div>

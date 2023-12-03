@@ -36,7 +36,7 @@ const Login = ({ onLogin }) => {
         const userData = querySnapshot.docs[0].data();
         setError(null);
         nav("/");
-        onLogin({ ...userData, uid: querySnapshot.docs[0].id });
+        onLogin({ ...userData, id: querySnapshot.docs[0].id });
       } else {
         // No user found with the provided username and password
         let errorMessage = 'Invalid username or password. Please try again.';

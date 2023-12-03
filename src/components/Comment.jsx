@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdAddComment, MdComment } from "react-icons/md";
+import { addComment, deleteComment, updateComment } from "./Firebase";
 
-const Comment = ({data}) => {
-  const [comment, setComment] = useState('');
-  const [commentsList, setCommentsList] = useState(data?data:[]);
+const Comment = ({ data, currentEvent, currentUser, isPreview }) => {
+  const [comment, setComment] = useState({});
+  const [commentsList, setCommentsList] = useState(data ? data : []);
   const [editIndex, setEditIndex] = useState(null);
 
-  const handleAddComment = () => {
-    if (comment.trim() !== '') {
+  const handleAddComment = async () => {
+    if (comment.message.trim() !== '') {
       if (editIndex !== null) {
         const updatedComments = [...commentsList];
         updatedComments[editIndex] = comment;
-        setCommentsList(updatedComments);
+        try{
+          await updateComment(comment);
+          setCommentsList(updatedComments);
+        } catch(e){
+          console.log("error: ", e);
+        }
         setEditIndex(null);
       } else {
-        setCommentsList([...commentsList, comment]);
+        try{
+          const newComment = { ...comment, eid: currentEvent.id, uid: currentUser.id, uname: currentUser.name};
+          await addComment(newComment);
+          setCommentsList([...commentsList, newComment]);
+        } catch(e){
+          console.log("error: ", e);
+        }
       }
-
-      setComment('');
+      setComment({});
     }
   };
 
@@ -28,10 +39,15 @@ const Comment = ({data}) => {
     setEditIndex(index);
   };
 
-  const handleDeleteComment = (index) => {
+  const handleDeleteComment = async (index) => {
     const updatedComments = [...commentsList];
-    updatedComments.splice(index, 1);
-    setCommentsList(updatedComments);
+    try{
+      await deleteComment(comment.id);
+      updatedComments.splice(index, 1);
+      setCommentsList(updatedComments);
+    } catch(e){
+      console.log("error: ", e);
+    }
   };
 
   return (
@@ -40,8 +56,8 @@ const Comment = ({data}) => {
         <div className="col-10">
           <input
             type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            value={comment.message || ''}
+            onChange={(e) => setComment({ ...comment, message: e.target.value })}
             className="form-control"
             placeholder="Type your comment..."
           />
@@ -54,24 +70,28 @@ const Comment = ({data}) => {
       </div>
 
       <div>
-        {commentsList.length>0 ? <h3>Comments:</h3> : <h6>No one has commented yet! Be the first!</h6>}
+        {commentsList.length > 0 ? <h3>Comments:</h3> : <h6>No one has commented yet! Be the first!</h6>}
         <ul className="list-group">
           {commentsList.map((c, index) => (
             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-              <span>{c}</span>
+              <span>{`${c.username}: ${c.message}`}</span>
               <div>
-                <button
-                  className="btn btn-warning btn-sm ml-2"
-                  onClick={() => handleEditComment(index)}
-                >
-                  <FaEdit/>
-                </button>
-                <button
-                  className="btn btn-danger btn-sm ml-5"
-                  onClick={() => handleDeleteComment(index)}
-                >
-                  <MdDelete/>
-                </button>
+                {c.uid === currentUser.id && (
+                  <>
+                    <button
+                      className="btn btn-warning btn-sm ml-2"
+                      onClick={() => handleEditComment(index)}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm ml-5"
+                      onClick={() => handleDeleteComment(index)}
+                    >
+                      <MdDelete />
+                    </button>
+                  </>
+                )}
               </div>
             </li>
           ))}
