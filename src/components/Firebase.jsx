@@ -121,3 +121,19 @@ export const deleteComment = async (commentId, eventId) => {
       comments: arrayRemove({ id: commentId }),
     });
 };
+
+export const deleteMediaByIndex = async (eventId, mediaId) => {
+    const eventRef = doc(db, 'Events', eventId);
+
+    // Retrieve the current document data
+    const eventSnapshot = await eventRef.get();
+    const eventData = eventSnapshot.data();
+  
+    // Check if the index is within the valid range
+    if (mediaId >= 0 && mediaId < eventData.media_urls.length) {
+        // Use arrayRemove to remove the element at the specified index
+        await updateDoc(eventRef, {
+            media_urls: arrayRemove(eventData.media_urls[mediaId]),
+        })
+    }
+}

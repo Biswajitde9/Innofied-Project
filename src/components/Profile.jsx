@@ -15,7 +15,21 @@ const Profile = ({ currentUser }) => {
   const [currentEvent, setCurrentEvent] = useState(null);
 
   const handleTabChange = (tab) => {
-    setActiveTab(tab);
+    if(activeTab == "create") setAlert(
+      <Alert
+        title="Discard changes?"
+        message="You will lose your changes if you leave this page."
+        onClose={()=>{
+          setAlert(null);
+        }}
+        onAccept={()=>{
+          setCurrentEvent(null);
+          setActiveTab(tab)
+          setAlert(null);
+        }}
+      />
+    );
+    else setActiveTab(tab);
   };
 
   // Function to delete an event
@@ -79,26 +93,30 @@ const Profile = ({ currentUser }) => {
   }
 
   const handleEventUpdate = async (event)=>{
-    if(!currentUser){
-      setAlert(
-        <Alert 
-          title="Edit Failure" 
-          message="You are not logged in!" 
-          onClose={()=>setAlert(null)}
-        />
-      )
-    } else if(event.id == null){
-      await createEvent({...event, uid: currentUser.id});
-    } else if (currentUser.managed.includes(event.id)) {
-      await updateEventById({...event, uid: currentUser.id});
-    } else {
-      setAlert(
-        <Alert 
-          title="Edit Failure" 
-          message="You are not authorized to edit this event!" 
-          onClose={()=>setAlert(null)}
-        />
-      )
+    try {
+      if(!currentUser){
+        setAlert(
+          <Alert 
+            title="Edit Failure" 
+            message="You are not logged in!" 
+            onClose={()=>setAlert(null)}
+          />
+        )
+      } else if(event.id == null){
+        await createEvent({...event, uid: currentUser.id});
+      } else if (currentUser.managed.includes(event.id)) {
+        await updateEventById({...event, uid: currentUser.id});
+      } else {
+        setAlert(
+          <Alert 
+            title="Edit Failure" 
+            message="You are not authorized to edit this event!" 
+            onClose={()=>setAlert(null)}
+          />
+        )
+      }
+    } catch(e){
+      console.log("error: ", e);
     }
 
     const element = document.getElementById(event.id);

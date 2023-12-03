@@ -1,8 +1,6 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { FaFacebookSquare, FaMapPin, FaTwitterSquare, FaInstagramSquare, FaPeopleArrows, FaUserFriends, FaUserCircle, FaUsersCog, FaUser, FaUserAlt, FaLocationArrow, FaMapMarker, FaMapMarkerAlt, FaStar, FaStarHalfAlt, FaStarHalf, FaCalendarWeek, FaCalendarCheck, FaCalendar, FaCalendarDay, FaCalendarAlt, FaCalendarTimes, FaDumpster, FaRecycle, FaEraser, FaCalendarMinus, FaWindowClose, FaRegWindowClose, FaCross, FaWindowMinimize, FaCaretSquareUp, FaAngleDoubleUp, FaPencilAlt, FaEdit, FaRegEdit, FaUserEdit, FaPen, FaAngleDoubleDown } from 'react-icons/fa';
 import { FaMapMarked, FaHeart } from 'react-icons/fa';
-import { db } from '../firebase-init';
-import { doc, deleteDoc } from 'firebase/firestore';
 import Maps from './Maps';
 import Comment from "./Comment";
 import { MdDelete } from "react-icons/md";
@@ -79,7 +77,11 @@ const Event = ({ currentUser, event, onLike, onEdit, onClose, onDelete, isMin = 
 
   return (
     <div id={event.id} ref={selfRef} className={`container my-3 overflow-hidden ${showMin ? "min" : "max"}`} style={style}>
-      {showLocation && <Maps latitude={location[0]} longitude={location[1]} onClose={() => setLocation(false)} />}
+      {showLocation && 
+        <div className='floating-preview'>
+          <Maps latitude={location[0]} longitude={location[1]} onClose={() => setLocation(false)} />
+        </div>
+      }
 
       <div
         className={`row ${showMin ? "w-100 justify-content-between" : "py-2 justify-content-start"}`}

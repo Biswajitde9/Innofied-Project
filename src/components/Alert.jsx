@@ -10,7 +10,7 @@ const Alert = ({ title, message, onAccept, onClose, className, style}) => {
                 </div>
                 <div className="button-row mb-2 d-flex justify-content-end">
                     {/* <FaWindowClose onClick={onClose} className="btn btn-danger" style={{width: 40}}/> */}
-                    <button onClick={onAccept} className="btn btn-danger me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 100 }}>Delete</button>
+                    <button onClick={onAccept} className="btn btn-danger me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 100 }}>Accept</button>
                     <button onClick={onClose} className="btn btn-primary me-2" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, width: 100 }}>Cancel</button>
                 </div>
                 <p className='p-4 text-center' style={{fontSize:"large"}}>{message}</p>

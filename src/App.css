@@ -219,3 +219,12 @@ svg {
     min-width: 768px;
   }
 }
+
+/* ------------------------------------------ */
+
+.img-input svg {
+  display: none;
+}
+.img-input:hover svg {
+  display: flex;
+}
