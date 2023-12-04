@@ -143,23 +143,49 @@ try{
 };
 
 export const updateComment = async (comment) => {
-    const { message, id, eId, uId, uname } = comment;
+    try {
+        const { message, id, eId, uId, uname } = comment;
 
-    // Update a comment in the "comments" array in the event document
-    const eventDocRef = doc(db, "Events", eId);
-    await updateDoc(eventDocRef, {
-        comments: arrayUnion({
-            id,
-            message,
-            uid: uId,
-            uname,
-            updated_at: serverTimestamp(),
-        }),
-    });
+        // Ensure the "comments" field is initialized as an array in your document
+        const eventDocRef = doc(db, "Events", eId);
+        const eventDoc = await getDoc(eventDocRef);
+
+        if (eventDoc.exists()) {
+            const existingComments = eventDoc.data().comments || [];
+
+            // Log the existing comments for debugging
+            console.log("Existing comments:", existingComments);
+
+            // Update a comment in the "comments" array in the event document
+            await updateDoc(eventDocRef, {
+                comments: arrayUnion({
+                    id,
+                    message,
+                    uid: uId,
+                    uname,
+                    updated_at: serverTimestamp(),
+                }),
+            });
+
+            console.log("Comment updated successfully.");
+        } else {
+            console.error(`Event document with ID ${eId} not found.`);
+        }
+    } catch (error) {
+        console.error("Error updating comment:", error);
+    }
 };
+
 
 export const deleteComment = async (commentId, eventId) => {
     // Remove the specified comment from the "comments" array in the event document
+    console.log('Deleting comment:', commentId, 'from event:', eventId);
+
+    if (!commentId || !eventId) {
+        console.error('Invalid commentId or eventId');
+        return;
+    }
+
     const eventDocRef = doc(db, "Events", eventId);
     await updateDoc(eventDocRef, {
         comments: arrayRemove({ id: commentId }),

@@ -10,6 +10,7 @@ const Comment = ({ data, currentEvent, currentUser, style }) => {
   const [editIndex, setEditIndex] = useState(null);
 
   const handleAddComment = async () => {
+    console.log('Adding comment:', comment);
     if (comment.message.trim() !== '') {
       if (editIndex !== null) {
         const updatedComments = [...commentsList];
@@ -41,15 +42,23 @@ const Comment = ({ data, currentEvent, currentUser, style }) => {
 
   const handleDeleteComment = async (index) => {
     const updatedComments = [...commentsList];
-    try{
-      await deleteComment(comment.id);
-      updatedComments.splice(index, 1);
-      setCommentsList(updatedComments);
-    } catch(e){
-      console.log("error: ", e);
+    try {
+      const commentToDelete = updatedComments[index];
+      console.log("Deleting comment:", commentToDelete, "from event:", currentEvent.id);
+      
+      if (commentToDelete) {
+        await deleteComment(commentToDelete.id, currentEvent.id);
+        updatedComments.splice(index, 1);
+        setCommentsList(updatedComments);
+        console.log("Comment deleted successfully.");
+      } else {
+        console.log("Comment to delete is undefined.");
+      }
+    } catch (e) {
+      console.log("Error deleting comment:", e);
     }
   };
-
+  
   return (
     <div className="container mt-4 ps-0" style={style}>
       <div className='row'>
@@ -102,3 +111,4 @@ const Comment = ({ data, currentEvent, currentUser, style }) => {
 };
 
 export default Comment;
+
